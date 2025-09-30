@@ -1,0 +1,8 @@
+@use '../app/ng-theme/header/header.component.scss' as *;
+@use './material-style-override.scss' as *;
+
+@mixin custom-component-theme($theme){
+    @include header-theme($theme);
+
+    @include material-color-overrides-theme($theme);
+}

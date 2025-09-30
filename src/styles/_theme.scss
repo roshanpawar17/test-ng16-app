@@ -1,0 +1,34 @@
+@use '@angular/material' as mat;
+@use './component-theme.scss' as *;
+
+@include mat.core();
+
+$primary: mat.define-palette(mat.$indigo-palette, 500);
+$accent: mat.define-palette(mat.$pink-palette, 500);
+$warn: mat.define-palette(mat.$red-palette);
+
+$light-theme: mat.define-light-theme((
+    color: (
+        primary: $primary,
+        accent: $accent,
+        warn: $warn,
+    )
+));
+
+$dark-theme: mat.define-dark-theme((
+    color: (
+        primary: $primary,
+        accent: $accent,
+        warn: $warn,
+    )
+));
+
+@include mat.all-component-typographies();
+@include mat.all-component-themes($light-theme);
+@include custom-component-theme($light-theme);
+
+.dark-theme {
+    @include mat.all-component-colors($dark-theme);
+    @include custom-component-theme($dark-theme);
+}
+

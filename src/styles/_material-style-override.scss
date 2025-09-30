@@ -1,0 +1,13 @@
+@use '@angular/material' as mat;
+
+@mixin material-color-overrides-theme($theme) {
+
+    $foreground: map-get($theme, foreground);
+    $background: map-get($theme, background);
+
+    // Slide toggle
+    .mat-mdc-slide-toggle .mdc-form-field .mdc-label {
+        color: mat.get-color-from-palette($foreground, text);
+    }
+}
+

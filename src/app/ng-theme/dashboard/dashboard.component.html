@@ -1,0 +1,26 @@
+<div class="dashboard-container">
+    <mat-drawer-container>
+        <mat-drawer mode="side" opened>
+            <mat-nav-list>
+                <a mat-list-item routerLink="/link1">Home</a>
+                <a mat-list-item routerLink="/link1">View</a>
+                <a mat-list-item routerLink="/link1">About</a>
+                <a mat-list-item routerLink="/link1">Contact</a>
+            </mat-nav-list>
+        </mat-drawer>
+        <mat-drawer-content>
+            <h2>List of People</h2>
+
+            <mat-list role="list" class="mat-elevation-z8">
+                <mat-list-item> Rohan </mat-list-item>
+                <mat-list-item> Atharva </mat-list-item>
+                <mat-list-item> Kunal </mat-list-item>
+                <mat-list-item> Mayur </mat-list-item>
+                <mat-list-item> Yash </mat-list-item>
+            </mat-list>
+
+            <button mat-flat-button color="primary" (click)="save()">Save</button>
+
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

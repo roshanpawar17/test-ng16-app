@@ -1,0 +1,32 @@
+@use '@angular/material' as mat;
+
+@mixin header-theme($theme) {
+    $primary: map-get($theme, primary);
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        // position: fixed;
+        // top: 0;
+        // z-index: 2;
+    
+        &-name {
+            // background-color: mat.get-color-from-palette($primary, 500);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+    
+            h2 {
+                margin: 0;
+            }
+        }
+    
+        &-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+    }
+}
