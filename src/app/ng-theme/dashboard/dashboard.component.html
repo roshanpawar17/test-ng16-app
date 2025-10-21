@@ -11,16 +11,33 @@
         <mat-drawer-content>
             <h2>List of People</h2>
 
+            <!-- <mat-list role="list" class="mat-elevation-z8">
+                <ng-container *ngFor="let name of names; let i = index">
+                    <mat-list-item> {{ name + ' ' + (i + 1)  }} </mat-list-item>
+                </ng-container>
+            </mat-list> -->
+
             <mat-list role="list" class="mat-elevation-z8">
-                <mat-list-item> Rohan </mat-list-item>
-                <mat-list-item> Atharva </mat-list-item>
-                <mat-list-item> Kunal </mat-list-item>
-                <mat-list-item> Mayur </mat-list-item>
-                <mat-list-item> Yash </mat-list-item>
+                <ng-template ngFor let-name [ngForOf]="names" let-i= index>
+                    <mat-list-item> {{ name + ' ' + (i + 1)  }} </mat-list-item>
+                </ng-template>
             </mat-list>
 
             <button mat-flat-button color="primary" (click)="save()">Save</button>
 
+            <!-- <div [ngSwitch]="case">
+                <p *ngSwitchCase="'r1'">Roshan</p>
+                <p *ngSwitchCase="'o'">Omkar</p>
+                <p *ngSwitchCase="'h'">Harsh</p>
+                <p *ngSwitchCase="'r2'">Raj</p>
+            </div> -->
+
+            <div [ngSwitch]="case">
+                <p *ngSwitchCase="1">Roshan</p>
+                <p *ngSwitchCase="2">Omkar</p>
+                <p *ngSwitchCase="3">Harsh</p>
+                <p *ngSwitchCase="4">Raj</p>
+            </div>
         </mat-drawer-content>
     </mat-drawer-container>
 </div>
