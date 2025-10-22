@@ -34,4 +34,9 @@
         <button mat-menu-item>Logout</button>
       </mat-menu>
   </div>
+
+  <div>
+    <input type="text" placeholder="Search..." #searchInput/>
+    <button mat-raised-button color="accent" (click)="search(searchInput.value)">Search</button>
+  </div>
 </mat-toolbar>

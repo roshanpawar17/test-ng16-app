@@ -6,5 +6,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./frame-layout.component.scss']
 })
 export class FrameLayoutComponent {
+  title = 'Header';
 
+  onToggle(isDarkMode: boolean) {
+    console.log('Sidenav toggled. Dark mode is now:', isDarkMode);
+  }
 }
