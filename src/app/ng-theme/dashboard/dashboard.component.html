@@ -38,6 +38,45 @@
                 <p *ngSwitchCase="3">Harsh</p>
                 <p *ngSwitchCase="4">Raj</p>
             </div>
+
+            <!-- app.component.html -->
+            <input #myInput type="text" placeholder="Enter name">
+            <button (click)="showValue()">Show Input Value</button>
+
+            <br><br>
+
+            <input #inputEl type="text" placeholder="First">
+            <input #inputEl type="text" placeholder="Middle">
+            <input #inputEl type="text" placeholder="Last">
+
+            <br><br>
+
+            <ng-template #greetTemplate>
+                <h2>Hello, Angular Learner!</h2>
+            </ng-template>
+
+            <br>
+
+            <ng-container *ngTemplateOutlet="greetTemplate"></ng-container>
+
+            <ng-template #userTemplate let-name="userName">
+                <p>Welcome, {{ name }}!</p>
+            </ng-template>
+
+            <ng-container *ngTemplateOutlet="userTemplate; context: { userName: 'Roshan' }"></ng-container>
+
+            <br>
+
+            <ng-container *ngIf="isAdmin; else userBlock">
+                <p>Welcome, Admin!</p>
+            </ng-container>
+
+            <ng-template #userBlock>
+                <p>Welcome, User!</p>
+            </ng-template>
+
+            
+
         </mat-drawer-content>
     </mat-drawer-container>
 </div>

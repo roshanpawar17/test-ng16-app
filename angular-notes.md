@@ -372,3 +372,355 @@ testMeth(){
 - You can then use myForm.valid or myForm.value to check form status or data.
 
 **------------------------------------------------------------------------------------------------**
+
+# @ViewChild
+
+-> The ViewChild decorator is used to query and get a reference of the DOM element in the component. 
+
+-> It returns the first matching element.
+
+-> @ViewChild is a decorator in Angular that lets you access a child element, directive, or component from your TypeScript code (the class) — not just the template.
+
+-> So if a template reference variable (#something) is used in HTML, then @ViewChild() is used in TypeScript to get that same element.
+
+-> 
+
+Metadata Properties:
+
+1. selector - The directive type or the name used for querying.
+2. read - Used to read a different token from the queried elements.
+
+- The read property tells Angular what type of instance you want from the matched element.
+- read → tells what type of thing you want back (HTML element? directive? template? container?).
+
+3. static - True to resolve query results before change detection runs, false to resolve after change detection. Defaults to false.
+
+-> Eg.
+
+1]  Accessing an element        
+
+<input #myInput type="text" placeholder="Enter name">
+<button (click)="showValue()">Show Input Value</button>
+
+@ViewChild('myInput') inputElement!: ElementRef;
+
+or
+
+@ViewChild('myInput', { static: false }) inputElement!: ElementRef;
+
+showValue() {
+  const value = this.inputElement.nativeElement.value;
+  console.log('Input Value: ' + value);
+}
+
+Note: static: false - means we can not use this before change detection run. means we can not able to access in ngOnInit, throwing undefine nativeElement error.
+
+
+2] Accessing an element
+
+<input #myInput type="text" placeholder="Enter name">
+<button (click)="showValue()">Show Input Value</button>
+
+@ViewChild('myInput', { static: true }) inputElement!: ElementRef;
+
+ngOnInit(): void {
+  const value = this.inputElement.nativeElement.value;
+  console.log('Input Value: ' + value);
+}
+
+Note: static: true - means we can use this before change detection run. means we can able to access in ngOnInit also, not throwing error.
+
+
+3] Accessing a Child Component
+
+// child.component.ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template: `<p>Hello from child!</p>`
+})
+export class ChildComponent {
+  greet() {
+    alert('Hello from Child Component!');
+  }
+}
+
+
+<!-- app.component.html -->
+<app-child></app-child>
+<button (click)="callChild()">Call Child Method</button>
+
+
+import { Component, ViewChild } from '@angular/core';
+import { ChildComponent } from './child/child.component';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html'
+})
+export class AppComponent {
+  @ViewChild(ChildComponent) childComp!: ChildComponent;
+
+  callChild() {
+    this.childComp.greet();
+  }
+}
+
+
+4] Accessing a Directive
+
+<p appHighlight #highlightDir>Hover me!</p>
+
+@ViewChild('highlightDir') highlightDirective!: HighlightDirective;
+
+ngAfterViewInit() {
+  this.highlightDirective.highlight();  // Works ✅
+}
+
+<!-- custom directive: -->
+import { Directive, ElementRef } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective {
+  constructor(public el: ElementRef) {}
+  highlight() {
+    this.el.nativeElement.style.backgroundColor = 'yellow';
+  }
+}
+
+5] read property:
+
+1)
+
+@ViewChild('paraRef', { read: ElementRef }) paragraphEl!: ElementRef;
+
+ngAfterViewInit() {
+  this.paragraphEl.nativeElement.style.color = 'red';
+}
+
+2) 
+
+@ViewChild('tpl', { read: TemplateRef }) template!: TemplateRef<any>;
+@ViewChild('tpl', { read: ViewContainerRef }) viewContainer!: ViewContainerRef;
+
+- TemplateRef → gives access to the template itself (its content).
+- ViewContainerRef → gives access to the container that can hold or render views.
+
+
+**------------------------------------------------------------------------------------------------**
+
+
+# @ViewChildren
+
+-> The ViewChildren decorator is used to get a reference to the list of DOM element from the view template in the component class.
+
+-> It returns all the matching elements.
+
+-> @ViewChildren helps you access multiple child elements, directives, or components from your template at once.
+
+-> Eg.
+
+1] Access element
+
+<input #inputEl type="text" placeholder="First">
+<input #inputEl type="text" placeholder="Middle">
+<input #inputEl type="text" placeholder="Last">
+
+<button (click)="showValue()">Show Input Value</button>
+
+@ViewChildren('inputEl') inputEl!: QueryList<ElementRef>;
+
+showValue() {
+  this.inputEl.forEach((el)=>{
+    console.log('Input Element Value: ' + el.nativeElement.value);
+  });
+}
+
+2] Access Component
+
+
+<app-child></app-child>
+<app-child></app-child>
+<app-child></app-child>
+
+@ViewChildren(ChildComponent) childComponents!: QueryList<ChildComponent>;
+
+ngAfterViewInit() {
+  console.log(this.childComponents); // list of all child components
+  this.childComponents.forEach(child => child.sayHello());
+}
+
+- Has useful methods like:
+
+.toArray() → converts to normal array
+
+.forEach() → loop through items
+
+.changes → observable that emits when the list updates
+
+
+**------------------------------------------------------------------------------------------------**
+
+
+# ng-template
+
+-> ng-template is a container that holds HTML content which is not displayed by default —
+
+-> it’s like a hidden HTML block that Angular can show or use later when needed.
+
+-> Eg.
+
+1] Basic Example
+
+<ng-template>
+  <p>This content is inside ng-template</p>
+</ng-template>
+
+2] Using with *ngIf
+
+<p *ngIf="isLoggedIn; else loginBlock">Welcome back!</p>
+
+<ng-template #loginBlock>
+  <p>Please login</p>
+</ng-template>
+
+
+3] Using with *ngFor
+
+<ng-template ngFor let-name [ngForOf]="names" let-i="index">
+  <li>{{ name }}</li>
+</ng-template>
+
+4] Using a Template Reference (#)
+
+<ng-template #greetTemplate>
+  <h2>Hello, Angular Learner!</h2>
+</ng-template>
+
+<ng-container *ngTemplateOutlet="greetTemplate"></ng-container>
+
+5] Passing Data into ng-template
+
+<ng-template #userTemplate let-name="userName">
+  <p>Welcome, {{ name }}!</p>
+</ng-template>
+
+<ng-container *ngTemplateOutlet="userTemplate; context: { userName: 'Roshan' }"></ng-container>
+
+6]
+
+<ng-template #myTpl>
+  <p>Hello from Template!</p>
+</ng-template>
+
+@ViewChild('myTpl') tpl!: TemplateRef<any>;
+
+ngAfterViewInit() {
+  console.log(this.tpl); // TemplateRef object
+  console.log('greetTemplate ', this.greetTemplate.createEmbeddedView({}).rootNodes[0].textContent); // Hello from Template!
+}
+
+**------------------------------------------------------------------------------------------------**
+
+# ng-container
+
+-> ng-container is just a logical container — it does not create any extra HTML element in the DOM.
+
+-> It’s often used with ng-template for conditional or dynamic content.
+
+-> ng-container is a special Angular element that can hold structural directives without adding new/extra elements to the DOM.
+
+-> So Angular gives you ng-container as a lightweight placeholder that doesn’t affect your design.
+
+-> Eg.
+
+1] Using with *ngIf
+
+<ng-container *ngIf="isLoggedIn">
+  <p>Welcome back!</p>
+  <button>Logout</button>
+</ng-container>
+
+Output in DOM:
+
+<p>Welcome back!</p>
+<button>Logout</button>
+
+
+2] Using with *ngFor
+
+<ng-container *ngFor="let item of items">
+  <p>{{ item }}</p>
+</ng-container>
+
+3] Using with ngIf and ngElse
+
+<ng-container *ngIf="isAdmin; else userBlock">
+  <p>Welcome, Admin!</p>
+</ng-container>
+
+<ng-template #userBlock>
+  <p>Welcome, User!</p>
+</ng-template>
+
+
+**------------------------------------------------------------------------------------------------**
+
+# ng-content
+
+-> ng-content is a placeholder in your component’s template where you can insert content from outside that component.
+
+-> It’s used for content projection — which means:
+📤 passing HTML from parent → to child and showing it inside the child’s layout.
+
+-> Eg.
+
+1]
+
+frame-layout component - parent
+
+<app-test-child>
+  <h2 id="heading">Heading App Child</h2>
+  <button mat-stroked-button color="primary" (click)="appHeader.testMeth()" class="btn">Click</button>
+</app-test-child>
+
+test-child component - child
+
+<div>
+  <ng-content select="#heading"></ng-content> -> <h2 id="heading">Heading App Child</h2>
+  <p>App Child Component Para</p>
+  <ng-content select=".btn"></ng-content> -> <button mat-stroked-button color="primary" (click)="appHeader.testMeth()" class="btn">Click</button>
+</div>
+
+2]
+
+Parent Component (parent.component.html)
+
+<app-child>
+  <div card-header>🌟 My Custom Header</div>
+  <p>This is the main content.</p>
+  <div card-footer>© 2025 Footer here</div>
+</app-child>
+
+
+Child Component (child.component.html)
+
+<div class="card">
+  <header>
+    <ng-content select="[card-header]"></ng-content>
+  </header>
+
+  <section>
+    <ng-content></ng-content> <!-- default slot -->
+  </section>
+
+  <footer>
+    <ng-content select="[card-footer]"></ng-content>
+  </footer>
+</div>
+
+
+**------------------------------------------------------------------------------------------------**

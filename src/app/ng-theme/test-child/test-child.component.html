@@ -1,0 +1,19 @@
+<!-- <div style="padding: 1rem;">
+    <ng-content select="#heading"></ng-content>
+    <p>App Child Component Para</p>
+    <ng-content select=".btn"></ng-content>
+</div> -->
+
+<div class="card">
+  <header>
+    <ng-content select="[card-header]"></ng-content>
+  </header>
+
+  <section>
+    <ng-content></ng-content> <!-- default slot -->
+  </section>
+
+  <footer>
+    <ng-content select="[card-footer]"></ng-content>
+  </footer>
+</div>

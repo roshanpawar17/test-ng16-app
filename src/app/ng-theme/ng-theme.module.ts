@@ -7,13 +7,15 @@ import { FrameLayoutComponent } from './frame-layout/frame-layout.component';
 import { HeaderComponent } from './header/header.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SharedModule } from '../shared/shared.module';
+import { TestChildComponent } from './test-child/test-child.component';
 
 @NgModule({
   declarations: [
     NgThemeComponent,
     FrameLayoutComponent,
     HeaderComponent,
-    DashboardComponent
+    DashboardComponent,
+    TestChildComponent
   ],
   imports: [
     CommonModule,
