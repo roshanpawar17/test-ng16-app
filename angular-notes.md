@@ -830,6 +830,13 @@ export class TestChildComponent {
 
 -> Component Initialization = The entire process of creating, setting up, rendering, and running lifecycle hooks of a component.
 
+-> Change Detection Run's on:
+
+  1. When @Input property change
+  2. When DOM event happend (click, change)
+  3. on setTimeout, setInterval 
+  4. on API Calles
+
 * Step 1: Component Class is Instantiated
 
 -> Angular creates an instance of your component class.
