@@ -724,3 +724,161 @@ Child Component (child.component.html)
 
 
 **------------------------------------------------------------------------------------------------**
+
+# @ContentChild Decorator
+
+-> The @ContentChild decorator is used to access a reference of a DOM element or a component or directive from the projected content into 
+  child component class.
+
+-> @ViewChild → looks inside the child’s own template
+-> @ContentChild → looks inside the projected content (content passed from parent through ng-content)
+
+-> Eg.
+
+1] DOM element
+
+frame-layout component - parent
+
+<app-test-child>
+  <div card-header>My Custom Header</div>
+  <p #para>This is the main content.</p>
+  <div card-footer>© 2025 Footer here</div>
+</app-test-child>
+
+
+test-child component - child .ts
+
+<button (click)="getProjectedContent()">Show Content</button>
+
+export class TestChildComponent {
+
+  @ContentChild('para') para!: ElementRef<any>;
+
+  getProjectedContent() {
+    console.log('Project Content ', this.para);
+    console.log('Project Content nativeElement ', this.para.nativeElement);
+    console.log('Project Content nativeElement value - ', this.para.nativeElement.textContent);
+    this.para.nativeElement.style.color = 'blue';
+  }
+}
+
+2] Using a Directive in Projected Content
+
+@Directive({
+  selector: '[highlight]'
+})
+export class HighlightDirective {
+  constructor(public el: ElementRef) {}
+  highlight(color: string) {
+    this.el.nativeElement.style.backgroundColor = color;
+  }
+}
+
+
+Parent Component:
+
+<app-child>
+  <p highlight>Project me!</p>
+</app-child>
+
+Child Component:
+
+@ContentChild(HighlightDirective) highlighter!: HighlightDirective;
+
+ngAfterContentInit() {
+  this.highlighter.highlight('yellow');
+}
+
+
+**------------------------------------------------------------------------------------------------**
+
+# @ContentChildren Decorator
+
+-> @ContentChildren lets a child component access multiple elements, directives, or components that are projected from the parent into it (via <ng-content>).
+
+-> @ContentChild → get one projected item.
+
+-> @ContentChildren → get all projected items as a list (QueryList).
+
+frame-layout component - parent
+
+<app-test-child>
+  <div card-header>🌟 My Custom Header</div>
+  <p #para>This is the main content.</p>
+  <p #para>This is the main content 2.</p>
+  <div card-footer>© 2025 Footer here</div>
+</app-test-child>
+
+test-child component - child .ts
+
+export class TestChildComponent {
+
+  @ContentChild('para') para!: ElementRef<any>;
+  @ContentChildren('para') paras!: QueryList<ElementRef>;
+
+  getProjectedContent() {
+    this.paras.forEach((para)=>{
+      console.log('Project Content nativeElement ', para.nativeElement);
+      para.nativeElement.style.color = 'blue';
+    });
+  }
+}
+
+**------------------------------------------------------------------------------------------------**
+
+# Component Initialization
+
+-> Component Initialization = The entire process of creating, setting up, rendering, and running lifecycle hooks of a component.
+
+* Step 1: Component Class is Instantiated
+
+-> Angular creates an instance of your component class.
+-> The constructor runs first.
+
+constructor() {
+  console.log('1️⃣ Constructor called');
+}
+
+At this point:
+
+-> Inputs are not yet set.
+-> The template (HTML) is not rendered.
+-> You can only initialize class-level variables here.
+
+* Step 2: Input Properties are Set
+
+-> If the parent passes data using @Input(), Angular sets those values after the constructor.
+-> Eg. @Input() title!: string;
+-> These are assigned before ngOnInit() runs.
+
+# ngOnChanges() hook
+
+* Step 3: ngOnChanges() (if inputs are present)
+
+-> Called whenever an @Input property changes.
+-> It runs before ngOnInit(), and also later if inputs update again.
+-> Eg.
+
+ngOnChanges(changes: SimpleChanges) {
+  console.log('2️⃣ ngOnChanges called', changes);
+}
+
+-> Called when have change in currentValue and previousValue.
+
+
+# ngOnInit() hook
+
+* step 4: ngOnInit()
+
+-> Called once after all inputs are set.
+-> Perfect place to do initialization logic — like API calls or data setup.
+-> Eg.
+
+ngOnInit() {
+  console.log('3️⃣ ngOnInit called');
+}
+
+At this point:
+
+-> Inputs are ready ✅
+-> Template is not yet fully rendered, but data is available.

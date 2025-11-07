@@ -18,7 +18,7 @@ export class HeaderComponent implements OnInit {
   renderer = inject(Renderer2);
   
   ngOnInit(): void {
-    console.log('Title:', this.title);
+    // console.log('Title:', this.title);
   }
 
   setTheme(isdark: boolean) {

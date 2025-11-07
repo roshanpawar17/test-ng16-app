@@ -11,9 +11,20 @@ export class FrameLayoutComponent {
   @ViewChild(HeaderComponent) headerComp!: HeaderComponent;
 
   title = 'Header';
+  message: string = 'Hi';
+  toggle: boolean = false;
+
+  list = ['Roshan'];
 
   onToggle(isDarkMode: boolean) {
     console.log('Sidenav toggled. Dark mode is now:', isDarkMode);
     this.headerComp.testMeth();
+  }
+
+  changeMsg() {
+    this.toggle = !this.toggle;
+    this.message = this.toggle ? 'Hello' : 'Hi';
+
+    this.list.push('Omkar');
   }
 }

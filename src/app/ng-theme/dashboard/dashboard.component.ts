@@ -50,7 +50,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     // const value = this.inputElement.nativeElement.value;
     // console.log('Input Value: ' + value);
-    console.log('greetTemplate ', this.greetTemplate.createEmbeddedView({}).rootNodes[0].textContent);
+    // console.log('greetTemplate ', this.greetTemplate.createEmbeddedView({}).rootNodes[0].textContent);
   }
   
 
