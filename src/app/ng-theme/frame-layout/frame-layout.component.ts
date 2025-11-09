@@ -31,34 +31,34 @@ export class FrameLayoutComponent implements OnChanges, OnInit, DoCheck, AfterCo
   }
 
   constructor(){
-    console.log('Frame-layout parent contructor called ');
+    // console.log('Frame-layout parent contructor called ');
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('Frame-layout parent OnChange called ');
+    // console.log('Frame-layout parent OnChange called ');
   }
 
   ngOnInit(): void {
-    console.log('Frame-layout parent OnInit called');
+    // console.log('Frame-layout parent OnInit called');
   }
 
   ngDoCheck(): void {
-    console.log('Frame-layout parent DoCheck called');
+    // console.log('Frame-layout parent DoCheck called');
   }
 
   ngAfterContentInit(): void {
-    console.log('Frame-layout parent ngAfterContentInit called');
+    // console.log('Frame-layout parent ngAfterContentInit called');
   }
 
   ngAfterContentChecked(): void {
-    console.log('Frame-layout parent ngAfterContentChecked called');
+    // console.log('Frame-layout parent ngAfterContentChecked called');
   }
 
   ngAfterViewInit(): void {
-    console.log('Frame-layout parent ngAfterViewInit called');
+    // console.log('Frame-layout parent ngAfterViewInit called');
   }
 
   ngAfterViewChecked(): void {
-    console.log('Frame-layout parent ngAfterViewChecked called');
+    // console.log('Frame-layout parent ngAfterViewChecked called');
   }
 }

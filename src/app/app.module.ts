@@ -8,10 +8,12 @@ import { SharedModule } from './shared/shared.module';
 import { HeaderComponent } from './ng-theme/header/header.component';
 import { DashboardComponent } from './ng-theme/dashboard/dashboard.component';
 import { FrameLayoutComponent } from './ng-theme/frame-layout/frame-layout.component';
+// import { BackgroundDirective } from './core/directives/background.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
+    // BackgroundDirective,
     // HeaderComponent,
     // DashboardComponent,
     // FrameLayoutComponent

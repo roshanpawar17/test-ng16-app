@@ -983,3 +983,211 @@ ngAfterViewChecked() {
 ngOnDestroy() {
   console.log('9️⃣ ngOnDestroy called');
 }
+
+**Note: Parent-child hook sequence:
+
+1. Frame-layout parent contructor called 
+2. Test child Constructor Called
+3. Frame-layout parent OnInit called
+4. Frame-layout parent DoCheck called
+5. Frame-layout parent ngAfterContentInit called
+6. Frame-layout parent ngAfterContentChecked called
+7. Test child OnInit called
+8. Test child DoCheck called
+9. Test child ngAfterContentInit called
+10. Test child ngAfterContentChecked called
+11. Test child ngAfterViewInit called
+12. Test child ngAfterViewChecked called
+13. Frame-layout parent ngAfterViewInit called
+14. Frame-layout parent ngAfterViewChecked called
+15. Frame-layout parent DoCheck called
+16. Frame-layout parent ngAfterContentChecked called
+
+**------------------------------------------------------------------------------------------------**
+
+# Custom attribute directive
+
+-> A Custom Attribute Directive is a class that you create to change the look or behavior of an HTML element or Angular component.
+-> It works just like Angular’s built-in directives — like ngClass, ngStyle, ngModel, etc.
+-> Create Directive File
+
+You can generate it using Angular CLI: 'ng generate directive highlight'
+This will create: 'highlight.directive.ts'
+
+-> Eg.
+
+- test-child.component.ts
+
+<h2 #h2Heading appBackground>Heading 2 {{name}}</h2>
+
+- background.directive.ts
+
+import { Directive, ElementRef, OnInit } from '@angular/core';
+
+@Directive({
+  selector: '[appBackground]'
+})
+export class BackgroundDirective implements OnInit {
+
+  constructor(private el: ElementRef) { }
+
+  ngOnInit(): void {
+    this.el.nativeElement.style.backgroundColor = 'red';
+    this.el.nativeElement.style.color = 'white';
+    this.el.nativeElement.style.padding = '1rem'
+    this.el.nativeElement.style.margin = '1rem 0'
+  }
+
+}
+
+**------------------------------------------------------------------------------------------------**
+
+# Renderer2
+
+-> Renderer2 is a service provided by Angular that lets you safely modify the DOM (add, remove, or style elements) in a way that works everywhere — not   just in the browser.
+
+-> Renderer2 allows us to manipulate the DOM without accessing the DOM elements directly, by providing a layer of abtraction between the DOM element and
+  the component code.
+
+-> Why Not Use document or element.nativeElement Directly?
+
+- Normally in JavaScript, you might do: document.getElementById('box').style.color = 'red';
+- But Angular apps can run:
+
+1. on servers (Angular Universal),
+2. on mobile (NativeScript),
+3. or in web workers (no real DOM!).
+
+- So if you use direct DOM access like this 👇:
+
+this.el.nativeElement.style.color = 'red';
+
+…it might break in non-browser environments
+
+- That’s why Angular gives you Renderer2 — a safe, cross-platform abstraction for DOM operations.
+
+-> Eg.
+
+1]
+
+- test-child.component.ts
+
+<h2 #h2Heading appBackground>Heading 2 {{name}}</h2>
+
+- background.directive.ts
+
+import { Directive, ElementRef, OnInit, Renderer2 } from '@angular/core';
+
+@Directive({
+  selector: '[appBackground]'
+})
+export class BackgroundDirective implements OnInit {
+
+  constructor(private el: ElementRef, private renderer: Renderer2) { }
+
+  ngOnInit(): void {
+    this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', 'red');
+    this.renderer.setStyle(this.el.nativeElement, 'color', 'white');
+    this.renderer.setStyle(this.el.nativeElement, 'padding', '1rem');
+    this.renderer.setStyle(this.el.nativeElement, 'margin', '1rem 0');
+
+    this.renderer.setProperty(this.el.nativeElement, 'textContent', 'Hello!');
+    this.renderer.setAttribute(this.el.nativeElement, 'title', 'Hi');
+
+    const newDiv = this.renderer.createElement('div');
+    const text = this.renderer.createText('Hello from Renderer2!');
+    this.renderer.appendChild(newDiv, text);
+    this.renderer.appendChild(this.el.nativeElement, newDiv);
+
+    this.renderer.listen(this.el.nativeElement, 'click', () => {
+      alert('Element clicked!');
+    });
+  }
+
+}
+
+
+2] 
+
+
+- test-child.component.ts
+
+<h2 #h2Heading appBackground>Heading 2 {{na<p appBackground="lightgreen">Hover me for light green</p>
+<p appBackground="pink">Hover me for pink</p>
+<p appBackground>Hover me for default blue</p>me}}</h2>
+
+- background.directive.ts
+
+import { Directive, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
+
+@Directive({
+  selector: '[appBackground]'
+})
+export class BackgroundDirective implements OnInit {
+
+  @Input('appBackground') appBackgroundColor: string = 'lightblue'; 
+
+  constructor(private el: ElementRef, private renderer: Renderer2) { }
+
+  ngOnInit(): void {
+    this.renderer.listen(this.el.nativeElement, 'mouseenter', () => {
+      this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', this.appBackgroundColor);
+    });
+
+    this.renderer.listen(this.el.nativeElement, 'mouseout', () => {
+      this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', '');
+    });
+
+    // this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', this.appBackgroundColor);
+  }
+
+}
+
+**------------------------------------------------------------------------------------------------**
+
+# @HostLister()
+
+-> @HostListener() is a decorator in Angular that allows you to listen to DOM events on the host element of a directive or component.
+
+-> Where It’s Used
+
+- Usually inside:
+
+1. Custom attribute directives
+2. Components (sometimes)
+
+It allows you to handle user interactions without directly writing event bindings in HTML.
+
+-> Eg.
+
+- test-child.component.ts
+
+<p appBackground="lightgreen">Hover me for light green</p>
+<p appBackground="pink">Hover me for pink</p>
+<p appBackground>Hover me for default blue</p>
+
+- background.directive.ts
+
+import { Directive, ElementRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
+
+@Directive({
+  selector: '[appBackground]'
+})
+export class BackgroundDirective implements OnInit {
+
+  @Input('appBackground') appBackgroundColor: string = 'lightblue'; 
+
+  constructor(private el: ElementRef, private renderer: Renderer2) { }
+
+  @HostListener('mouseenter', ['$event'])
+  onMouseEnter(event: Event) {
+    console.log('Mouseenter Event ', event);
+    this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', this.appBackgroundColor);
+  }
+
+  @HostListener('mouseout', ['$event'])
+  onMouseOut(event: Event) {
+    console.log('Mouseout Event ', event);
+    this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', '');
+  }
+}

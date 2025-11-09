@@ -19,6 +19,11 @@
 
   <button (click)="getProjectedContent()">Show Content</button>
 
-  <h2 #h2Heading>Heading 2 {{name}}</h2>
+  <h2 #h2Heading appBackground>Heading 2 {{name}}</h2>
   <button (click)="name = 'Raj'">Change View</button>
 </div>
+
+<br>
+<p appBackground="lightgreen">Hover me for light green</p>
+<p appBackground="pink">Hover me for pink</p>
+<p appBackground>Hover me for default blue</p>

@@ -8,6 +8,7 @@ import { HeaderComponent } from './header/header.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SharedModule } from '../shared/shared.module';
 import { TestChildComponent } from './test-child/test-child.component';
+import { BackgroundDirective } from '../core/directives/background.directive';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { TestChildComponent } from './test-child/test-child.component';
     FrameLayoutComponent,
     HeaderComponent,
     DashboardComponent,
-    TestChildComponent
+    TestChildComponent,
+    BackgroundDirective
   ],
   imports: [
     CommonModule,
