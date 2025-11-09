@@ -10,7 +10,7 @@
   </header>
 
   <section>
-    <ng-content></ng-content> <!-- default slot -->
+    <ng-content></ng-content> 
   </section>
 
   <footer>
@@ -18,4 +18,7 @@
   </footer>
 
   <button (click)="getProjectedContent()">Show Content</button>
+
+  <h2 #h2Heading>Heading 2 {{name}}</h2>
+  <button (click)="name = 'Raj'">Change View</button>
 </div>

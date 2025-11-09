@@ -1,41 +1,64 @@
-import { Component, ContentChild, ContentChildren, DoCheck, ElementRef, Input, OnChanges, OnInit, QueryList, SimpleChanges } from '@angular/core';
+import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, Component, ContentChild, ContentChildren, DoCheck, ElementRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-test-child',
   templateUrl: './test-child.component.html',
   styleUrls: ['./test-child.component.scss']
 })
-export class TestChildComponent implements OnChanges, OnInit, DoCheck {
+export class TestChildComponent implements OnChanges, OnInit, DoCheck, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked {
 
   @ContentChild('para') para!: ElementRef<any>;
   @ContentChildren('para') paras!: QueryList<ElementRef>;
 
+  @ViewChild('h2Heading') h2Heading!: ElementRef;
+
   // @Input() message!: string;
-  @Input() list!: string[];
+  // @Input() list!: string[];
 
   name = 'Roshan';
 
   constructor(){
-    console.log('Constructor Called');
+    console.log('Test child Constructor Called');
     // console.log('Messaeg ', this.message);
     // console.log('Name ', this.name);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('Changes ', changes);
+    console.log('Test child OnChange called ', changes);
     // console.log('Message ', this.message);
-    console.log('list ', this.list);
+    // console.log('list ', this.list);
   }
 
   ngOnInit(): void {
-    console.log('OnInit');
+    console.log('Test child OnInit called');
     // console.log('Message ', this.message);
-    console.log('list ', this.list);
+    // console.log('list ', this.list);
   }
 
   ngDoCheck(): void {
-     console.log('DoCheck');
-    console.log('list ', this.list);
+    console.log('Test child DoCheck called');
+    // console.log('Test child DoCheck ContentChild ', this.para);
+    // console.log('list ', this.list);
+  }
+
+  ngAfterContentInit(): void {
+    console.log('Test child ngAfterContentInit called');
+    // console.log('Test child ngAfterContentInit ContentChild ', this.para.nativeElement);
+  }
+
+  ngAfterContentChecked(): void {
+    console.log('Test child ngAfterContentChecked called');
+    // console.log('Test child ngAfterContentChecked ContentChild ', this.para.nativeElement);
+  }
+
+  ngAfterViewInit(): void {
+    console.log('Test child ngAfterViewInit called');
+    // console.log('Test child ngAfterViewInit ContentChild ', this.h2Heading.nativeElement);
+  }
+
+  ngAfterViewChecked(): void {
+    console.log('Test child ngAfterViewChecked called');
+    // console.log('Test child ngAfterViewChecked ContentChild ', this.h2Heading.nativeElement);
   }
 
   getProjectedContent() {

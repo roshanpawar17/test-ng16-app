@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, OnChanges, OnInit, DoCheck, SimpleChanges, Input, } from '@angular/core';
 import { HeaderComponent } from '../header/header.component';
 
 @Component({
@@ -6,9 +6,11 @@ import { HeaderComponent } from '../header/header.component';
   templateUrl: './frame-layout.component.html',
   styleUrls: ['./frame-layout.component.scss']
 })
-export class FrameLayoutComponent {
+export class FrameLayoutComponent implements OnChanges, OnInit, DoCheck, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked {
 
   @ViewChild(HeaderComponent) headerComp!: HeaderComponent;
+
+  @Input() t!: string;
 
   title = 'Header';
   message: string = 'Hi';
@@ -26,5 +28,37 @@ export class FrameLayoutComponent {
     this.message = this.toggle ? 'Hello' : 'Hi';
 
     this.list.push('Omkar');
+  }
+
+  constructor(){
+    console.log('Frame-layout parent contructor called ');
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('Frame-layout parent OnChange called ');
+  }
+
+  ngOnInit(): void {
+    console.log('Frame-layout parent OnInit called');
+  }
+
+  ngDoCheck(): void {
+    console.log('Frame-layout parent DoCheck called');
+  }
+
+  ngAfterContentInit(): void {
+    console.log('Frame-layout parent ngAfterContentInit called');
+  }
+
+  ngAfterContentChecked(): void {
+    console.log('Frame-layout parent ngAfterContentChecked called');
+  }
+
+  ngAfterViewInit(): void {
+    console.log('Frame-layout parent ngAfterViewInit called');
+  }
+
+  ngAfterViewChecked(): void {
+    console.log('Frame-layout parent ngAfterViewChecked called');
   }
 }

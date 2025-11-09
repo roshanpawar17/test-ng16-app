@@ -889,3 +889,97 @@ At this point:
 
 -> Inputs are ready ✅
 -> Template is not yet fully rendered, but data is available.
+
+
+# ngDoCheck() hook
+
+* step 5: ngDoCheck()
+
+-> Runs after each change detection cycle.
+-> This hook invoked even if there is no change in input bound properties.
+-> Used for custom change detection logic.
+-> Eg.[title]="title"
+
+ngDoCheck() {
+  console.log('4️⃣ ngDoCheck called');
+}
+
+
+# ngAfterContentInit() hook
+
+* Step 6: ngAfterContentInit()
+
+-> The ngAfterContentInit() lifecycle hook is called after the components projected content has been fully initialized.
+-> If the component uses @ContentChild or @ContentChildren, you can safely access them here.
+-> This lifecycle hook gets called only once, during the first change detection cycle. After that, if the projected content changes, this lifecycle hook
+  will not get called.
+-> It is component only hook.
+-> Eg.
+
+ngAfterContentInit() {
+  console.log('5️⃣ ngAfterContentInit called');
+}
+
+
+# ngAfterContentCheck() hook
+
+* Step 7: ngAfterContentCheck()
+
+-> Runs after each change detection cycle.
+-> Runs every time projected content is checked by Angular.
+-> If the component uses @ContentChild or @ContentChildren, you can safely access them here.
+-> It is component only hook.
+-> The ngAfterContentInit hook is called after the projected content is initialized.
+  ngAfterContentCheck is called whenever the projected content is initialized, checked & updated.
+-> Eg.
+
+ngAfterContentChecked() {
+  console.log('6️⃣ ngAfterContentChecked called');
+}
+
+
+# ngAfterViewInit()
+
+* Step 8: ngAfterViewInit()
+
+-> The ngAfterViewInit is called after the components view template and all its child components view template are fully initialized.
+-> You can safely access @ViewChild and @ViewChildren here.
+-> This hook is called during the first change detection cycle, when angular initializes the view for the first time.
+-> It is component only hook.
+-> Eg.
+
+ngAfterViewInit() {
+  console.log('7️⃣ ngAfterViewInit called');
+}
+
+
+# ngAfterViewChecked()
+
+* Step 9: ngAfterViewChecked()
+
+-> Runs after every change detection when the component’s view is updated.
+-> You can safely access @ViewChild and @ViewChildren here.
+-> It is component only hook. It is not availabel for directive.
+-> Eg.
+
+ngAfterViewChecked() {
+  console.log('8️⃣ ngAfterViewChecked called');
+}
+
+
+# ngOnDestroy()
+
+* Step 10: ngOnDestroy()
+
+-> Called right before Angular removes the component from the DOM.
+
+-> Use it to clean up:
+  - Unsubscribe from Observables
+  - Remove event listeners
+  - Stop timers, etc.
+
+-> Eg.
+
+ngOnDestroy() {
+  console.log('9️⃣ ngOnDestroy called');
+}
