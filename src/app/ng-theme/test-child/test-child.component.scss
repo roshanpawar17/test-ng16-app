@@ -1,0 +1,30 @@
+.dafult-style {
+    background-color: red;
+    color: white;
+}
+
+.hover-style {
+    background-color: blue;
+    color: red;
+}
+
+.disabled {
+    color: gray;
+    pointer-events: none;    
+}
+
+.app-backgrond {
+    background-color: yellow;
+}
+
+.app-border {
+    border: 1px solid black;
+}
+
+.app-font {
+    font-size: 20px;
+}
+
+.app-padding {
+    padding: 1rem;
+}

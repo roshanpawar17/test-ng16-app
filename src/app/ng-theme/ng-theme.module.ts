@@ -9,6 +9,10 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { SharedModule } from '../shared/shared.module';
 import { TestChildComponent } from './test-child/test-child.component';
 import { BackgroundDirective } from '../core/directives/background.directive';
+import { HighlightDirective } from '../core/directives/highlight.directive';
+import { DisabledDirective } from '../core/directives/disabled.directive';
+import { ClassDirective } from '../core/directives/class.directive';
+import { StyleDirective } from '../core/directives/style.directive';
 
 @NgModule({
   declarations: [
@@ -17,7 +21,11 @@ import { BackgroundDirective } from '../core/directives/background.directive';
     HeaderComponent,
     DashboardComponent,
     TestChildComponent,
-    BackgroundDirective
+    BackgroundDirective,
+    HighlightDirective,
+    DisabledDirective,
+    ClassDirective,
+    StyleDirective
   ],
   imports: [
     CommonModule,

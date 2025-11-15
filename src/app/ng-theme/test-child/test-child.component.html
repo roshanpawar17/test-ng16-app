@@ -24,6 +24,20 @@
 </div>
 
 <br>
-<p appBackground="lightgreen">Hover me for light green</p>
+<p [appBackground]="'lightgreen'">Hover me for light green</p>
 <p appBackground="pink">Hover me for pink</p>
 <p appBackground>Hover me for default blue</p>
+
+<!-- <p appHighlight>Hover me</p> -->
+<!-- <p [appHighlight]="'red'" [customeInput]="''">Hover me</p> -->
+<!-- <button [appDisabled]="false">Click</button> -->
+
+<p [appClass]="{ 'app-backgrond': true, 'app-border': false, 'app-font': 5 > 4, 'app-padding': true }">Custom class directive object way</p>
+
+<p [appClass]="5 > 4 ? 'app-backgrond' : ''">Custom class directive string way</p>
+
+<p [appStyle]="{ 'backgroundColor': 'blue', 'padding': 5 > 2 ? '1rem' : '', 'color': 'white' }">Custom style directive string way</p>
+
+
+<br>
+

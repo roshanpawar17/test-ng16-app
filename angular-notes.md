@@ -1162,7 +1162,7 @@ It allows you to handle user interactions without directly writing event binding
 
 - test-child.component.ts
 
-<p appBackground="lightgreen">Hover me for light green</p>
+<p [appBackground]="'lightgreen'">Hover me for light green</p>
 <p appBackground="pink">Hover me for pink</p>
 <p appBackground>Hover me for default blue</p>
 
@@ -1191,3 +1191,359 @@ export class BackgroundDirective implements OnInit {
     this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', '');
   }
 }
+
+**------------------------------------------------------------------------------------------------**
+
+# @HostBinding()
+
+-> It binds a DOM property of the host element to a variable in your directive/component class.
+-> So when your class variable changes, Angular automatically updates that property on the host element.
+-> Eg. 
+
+1] Bind CSS styles - @HostBinding('style.color') myColor: string = 'blue';
+2] Bind CSS classes - @HostBinding('class.active') isActive = false;
+3] Bind attributes - @HostBinding('attr.role') role = 'button';
+4] Bind boolean DOM properties - @HostBinding('disabled') isDisabled = true;
+
+5] full eg. Bind CSS styles
+
+highlight.directive.ts
+
+import { Directive, HostBinding, HostListener } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective {
+
+  @HostBinding('style.background') bg = 'transparent';
+
+  @HostListener('mouseenter')
+  onMouseEnter() {
+    this.bg = 'lightblue';
+  }
+
+  @HostListener('mouseleave')
+  onMouseLeave() {
+    this.bg = 'transparent';
+  }
+}
+
+
+Usage:
+
+<p appHighlight>Hover me</p>
+
+6] full eg. Bind CSS classes
+
+highlight.directive.ts
+
+import { Directive, HostBinding, HostListener } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective {
+
+  constructor() { }
+
+  @HostBinding('class') class = 'default-style';
+
+  @HostListener('mouseenter')
+  mouseEnter() {
+    this.class = 'hover-style';
+  }
+
+  @HostListener('mouseout')
+  mouseOut() {
+    this.class = 'dafult-style';
+  }
+
+}
+
+test-child.component.html
+
+<p appHighlight>Hover me</p>
+
+
+test-child.component.scss
+
+.dafult-style {
+  background-color: red;
+  color: white;
+}
+
+.hover-style {
+  background-color: blue;
+  color: red;
+}
+
+
+7] full eg. Bind CSS classes
+
+highlight.directive.ts
+
+import { Directive, HostBinding, HostListener } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective {
+
+  constructor() { }
+
+  @HostBinding('class.hover-style') class = false;
+
+  @HostListener('mouseenter')
+  mouseEnter() {
+    this.class = true;
+  }
+
+  @HostListener('mouseout')
+  mouseOut() {
+    this.class = false;
+  }
+
+}
+
+test-child.component.html
+
+<p appHighlight>Hover me</p>
+
+test-child.component.scss
+
+.hover-style {
+  background-color: blue;
+  color: red;
+}
+
+**------------------------------------------------------------------------------------------------**
+
+**Note: 
+
+1. Import Directive in Module file
+2. Import only in one module. Not more than one.
+
+# Property Binding in Directive
+
+Property binding inside a directive means:
+➡️ You expose an @Input() property on your directive
+➡️ The parent component can pass data to the directive
+➡️ The directive can use that value to change behavior, styles, classes, etc.
+
+➡️ Eg.
+
+1] 
+
+-> 1st way have only one property
+
+<p appHighlight [color]="'red'">Hover me</p>
+
+import { Directive, HostBinding, HostListener, Input, OnInit } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective implements OnInit {
+
+  constructor() { }
+
+  @Input() color: string = '';
+
+  @HostBinding('style.color') hcolor = '';
+
+  ngOnInit(): void {
+    this.hcolor = this.color
+  }
+
+}
+
+
+-> 2nd way have only one property
+
+<p [appHighlight]="'red'">Hover me</p>
+
+import { Directive, HostBinding, HostListener, Input, OnInit } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective implements OnInit {
+
+  constructor() { }
+
+  @Input('appHighlight') color: string = '';
+
+  @HostBinding('style.color') hcolor = '';
+
+  ngOnInit(): void {
+    this.hcolor = this.color
+  }
+
+}
+
+
+-> 3rd way have only one property
+
+<p [appHighlight]="'red'">Hover me</p>
+
+import { Directive, HostBinding, HostListener, Input, OnInit } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective implements OnInit {
+
+  constructor() { }
+
+  @Input() appHighlight: string = '';
+
+  @HostBinding('style.color') hcolor = '';
+
+  ngOnInit(): void {
+    this.hcolor = this.appHighlight;
+  }
+
+}
+
+-> Also add more inputs
+
+<p [appHighlight]="'red'" [myInput]="''">Hover me</p>
+
+import { Directive, HostBinding, HostListener, Input, OnInit } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective implements OnInit {
+
+  constructor() { }
+
+  @Input() appHighlight: string = '';
+  @Input() myInput: string = ''; <--
+
+  @HostBinding('style.color') hcolor = '';
+
+  ngOnInit(): void {
+    this.hcolor = this.appHighlight;
+  }
+
+}
+
+
+**------------------------------------------------------------------------------------------------**
+
+# Conditional Attribute Directive
+
+<button [appDisabled]="false">Click</button>
+
+import { Directive, ElementRef, Input, Renderer2 } from '@angular/core';
+
+@Directive({
+  selector: '[appDisabled]'
+})
+export class DisabledDirective {
+
+  constructor(private el: ElementRef, private renderer: Renderer2) { }
+
+  @Input() set appDisabled(disabled: boolean) {
+    if (disabled) {
+      this.renderer.addClass(this.el.nativeElement, 'disabled');
+    } 
+  }
+
+}
+
+
+**------------------------------------------------------------------------------------------------**
+
+# Custom class directive - like [ngClass]="{}" or [ngClass]=""
+
+test-child.component.scss
+
+.app-backgrond {
+  background-color: yellow;
+}
+
+.app-border {
+  border: 1px solid black;
+}
+
+.app-font {
+  font-size: 20px;
+}
+
+.app-padding {
+  padding: 1rem;
+}
+
+test-child.component.html
+
+<p [appClass]="{ 'app-backgrond': true, 'app-border': false, 'app-font': 5 > 4, 'app-padding': true }">Custom class directive object way</p>
+
+<p [appClass]="5 > 4 ? 'app-backgrond' : ''">Custom class directive string way</p>
+
+
+class.directive.ts
+
+import { Directive, ElementRef, Input, Renderer2 } from '@angular/core';
+
+@Directive({
+  selector: '[appClass]'
+})
+export class ClassDirective {
+
+  constructor(private el: ElementRef, private renderer: Renderer2) { }
+
+  @Input() set appClass(value: Object | string) {
+    if (typeof value === 'object') {
+      const entries = Object.entries(value);
+      for (let entry of entries) {
+        let [className, condition] = entry;
+
+        if (condition) {
+          this.renderer.addClass(this.el.nativeElement, className);
+        }
+      }
+
+    } else if (value && typeof value === 'string') {
+      this.renderer.addClass(this.el.nativeElement, value);
+    }
+  }
+
+}
+
+**------------------------------------------------------------------------------------------------**
+
+# Custom style directive - like [ngStyle]="{}"
+
+test-child.component.html
+
+<p [appStyle]="{ 'backgroundColor': 'blue', 'padding': 5 > 2 ? '1rem' : '', 'color': 'white' }">Custom style directive string way</p>
+
+style.directive.ts
+
+import { Directive, ElementRef, Input, Renderer2 } from '@angular/core';
+
+@Directive({
+  selector: '[appStyle]'
+})
+export class StyleDirective {
+
+  constructor(private el: ElementRef, private renderer: Renderer2) { }
+
+  @Input() set appStyle(styles: object) {
+    if (typeof styles === 'object') {
+      const entries = Object.entries(styles);
+      for (let entry of entries) {
+        let [style, value] = entry;
+        this.renderer.setStyle(this.el.nativeElement, style, value);
+      }
+    }
+  }
+
+}
+
+
+
+

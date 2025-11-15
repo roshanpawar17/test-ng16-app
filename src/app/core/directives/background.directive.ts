@@ -45,13 +45,13 @@ export class BackgroundDirective implements OnInit {
 
   @HostListener('mouseenter', ['$event'])
   onMouseEnter(event: Event) {
-    console.log('Mouseenter Event ', event);
+    // console.log('Mouseenter Event ', event);
     this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', this.appBackgroundColor);
   }
 
   @HostListener('mouseout', ['$event'])
   onMouseOut(event: Event) {
-    console.log('Mouseout Event ', event);
+    // console.log('Mouseout Event ', event);
     this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', '');
   }
 
