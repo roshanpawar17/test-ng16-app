@@ -1,9 +1,10 @@
-import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, Component, ContentChild, ContentChildren, DoCheck, ElementRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, Component, ContentChild, ContentChildren, DoCheck, ElementRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-test-child',
   templateUrl: './test-child.component.html',
   styleUrls: ['./test-child.component.scss'],
+  encapsulation: ViewEncapsulation.ShadowDom
 })
 export class TestChildComponent implements OnChanges, OnInit, DoCheck, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked {
 
@@ -16,6 +17,7 @@ export class TestChildComponent implements OnChanges, OnInit, DoCheck, AfterCont
   // @Input() list!: string[];
 
   name = 'Roshan';
+  color = ''
 
   constructor(){
     // console.log('Test child Constructor Called');

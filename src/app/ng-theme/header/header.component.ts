@@ -1,11 +1,12 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output, Renderer2 } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output, Renderer2, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-header', // element-directive
   // selector: '[app-header]', // attribute directive
   // selector: '.app-header', // class directive
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.scss'],
+  // encapsulation: ViewEncapsulation.ShadowDom
 })
 export class HeaderComponent implements OnInit {
   

@@ -1,10 +1,11 @@
-import { Component, ViewChild, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, OnChanges, OnInit, DoCheck, SimpleChanges, Input, } from '@angular/core';
+import { Component, ViewChild, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, OnChanges, OnInit, DoCheck, SimpleChanges, Input, ViewEncapsulation, } from '@angular/core';
 import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-frame-layout',
   templateUrl: './frame-layout.component.html',
-  styleUrls: ['./frame-layout.component.scss']
+  styleUrls: ['./frame-layout.component.scss'],
+  // encapsulation: ViewEncapsulation.None
 })
 export class FrameLayoutComponent implements OnChanges, OnInit, DoCheck, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked {
 

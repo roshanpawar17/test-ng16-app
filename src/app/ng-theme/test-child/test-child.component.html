@@ -32,11 +32,30 @@
 <!-- <p [appHighlight]="'red'" [customeInput]="''">Hover me</p> -->
 <!-- <button [appDisabled]="false">Click</button> -->
 
-<p [appClass]="{ 'app-backgrond': true, 'app-border': false, 'app-font': 5 > 4, 'app-padding': true }">Custom class directive object way</p>
+<!-- <p [appClass]="{ 'app-backgrond': true, 'app-border': false, 'app-font': 5 > 4, 'app-padding': true }">Custom class directive object way</p> -->
 
-<p [appClass]="5 > 4 ? 'app-backgrond' : ''">Custom class directive string way</p>
+<!-- <p [appClass]="5 > 4 ? 'app-backgrond' : ''">Custom class directive string way</p> -->
 
-<p [appStyle]="{ 'backgroundColor': 'blue', 'padding': 5 > 2 ? '1rem' : '', 'color': 'white' }">Custom style directive string way</p>
+<!-- <p [appStyle]="{ 'backgroundColor': 'blue', 'padding': 5 > 2 ? '1rem' : '', 'color': 'white' }">Custom style directive string way</p> -->
+
+<!-- <ng-template [ngIf]="true">
+  <div>
+    <p>Welcome User!</p>
+  </div>
+</ng-template> -->
+
+<div *appIf="true">
+  <p>Welcome User!</p>
+</div>
+
+<div [ngSwitch]="color">
+  <p *ngSwitchCase="'red'">Red selected</p>
+  <p *ngSwitchCase="'blue'">Blue selected</p>
+  <p *ngSwitchCase="'green'">Green selected</p>
+  <p *ngSwitchDefault>Select a valid color</p>
+</div>
+
+<button>Button Test Compo</button>
 
 
 <br>

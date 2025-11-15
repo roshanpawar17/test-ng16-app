@@ -1544,6 +1544,230 @@ export class StyleDirective {
 
 }
 
+**------------------------------------------------------------------------------------------------**
+
+# How structural directive works
+
+-> Structural directives change the DOM structure — they add, remove, or modify elements in the DOM.
+
+Examples:
+
+*ngIf
+*ngFor
+*ngSwitch
+
+Let’s break it into simple words.
+
+-> What is a Structural Directive?
+
+A structural directive is a directive that uses a * and tells Angular:
+
+“I want to add or remove elements dynamically.”
+
+It changes how the DOM is structured.
+
+Eg. <div *ngIf="show">Hello</div>
+
+If show = false, Angular removes this <div> from the DOM.
+
+-> Why Do They Use *?
+
+The * is just a short-hand syntax.
+
+This code:
+
+<div *ngIf="show"></div>
+
+is SAME AS:
+
+<ng-template [ngIf]="show">
+  <div></div>
+</ng-template>
+
+Angular expands the * into an ng-template.
+
+-> A structural directive uses TemplateRef + ViewContainerRef to add or remove parts of the DOM.
+
+**------------------------------------------------------------------------------------------------**
+
+# Custom Structural Directive
+
+A structural directive needs:
+
+1. TemplateRef → the HTML block you want to insert/remove
+2. ViewContainerRef → the place where Angular inserts views
+3. Some logic → when to create & destroy views
+
+-> if.directive.ts
+
+import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+
+@Directive({
+  selector: '[appIf]'
+})
+export class IfDirective {
+
+  constructor(private templateRef: TemplateRef<any>, private vcr: ViewContainerRef) { }
+
+  @Input() set appIf(condition: boolean) {
+    if (condition) {
+      this.vcr.createEmbeddedView(this.templateRef);
+    } else {
+      this.vcr.clear();
+    }
+  }
+
+}
+
+<div *appIf="true">
+  <p>Welcome User!</p>
+</div>
+
+✔ TemplateRef → contains the HTML inside the directive
+✔ ViewContainerRef → the container where Angular will insert the view
+✔ createEmbeddedView() → adds the element to DOM
+✔ clear() → removes it
+
+**Note:
+
+| Concept              | Meaning                           |
+| -------------------- | --------------------------------- |
+| `*` shorthand        | Converts DOM into `<ng-template>` |
+| `TemplateRef`        | Holds the template block          |
+| `ViewContainerRef`   | Inserts/removes template content  |
+| Structural directive | modifies DOM structure            |
+| Examples             | `*ngIf`, `*ngFor`, custom         |
 
 
+**------------------------------------------------------------------------------------------------**
+
+# ngSwitch
+
+-> ngSwitch is an Angular structural directive used when you need multiple conditional views — similar to a switch-case statement in JavaScript.
+
+It helps you show one template out of many based on a matching value.
+
+-> Eg.
+
+color = ''; -> <p *ngSwitchDefault>Select a valid color</p>
+color = 'red' ->  <p *ngSwitchCase="'red'">Red selected</p>
+
+<div [ngSwitch]="color">
+  <p *ngSwitchCase="'red'">Red selected</p>
+  <p *ngSwitchCase="'blue'">Blue selected</p>
+  <p *ngSwitchCase="'green'">Green selected</p>
+  <p *ngSwitchDefault>Select a valid color</p>
+</div>
+
+**------------------------------------------------------------------------------------------------**
+
+# View Encapsulation
+
+-> Encapsulation: Encapsulation meanse hiding data and behavior from outside world.
+
+-> View Encapsulation: The View Encapsulation is a concept or behavior in Angular, where component CSS style are encapsulted into the components view and 
+  dot not affect the rest of the application.
+
+-> Why View Encapsulation Exists?
+
+To prevent this problem:
+
+❌ A component’s CSS accidentally affecting other components
+❌ Global CSS overriding component CSS
+
+Angular gives each component its own style boundary, so the styles stay inside.
+
+-> There are 3 Types of View Encapsulation
+
+1) Emulated (Default)
+
+-> encapsulation: ViewEncapsulation.Emulated
+
+✔ Most commonly used
+✔ Angular modifies CSS selectors to scope them to the component
+
+Example:
+
+h1 {
+  color: red;
+}
+
+Angular transforms this into:
+
+h1[_ngcontent-eaj-1] {
+  color: red;
+}
+
+And HTML becomes:
+
+<h1 _ngcontent-eaj-1>Heading</h1>
+
+So styles apply only to this component.
+
+Advantages:
+
+Best balance
+Prevents style leakage
+No browser issues
+Default for most apps
+
+2) ShadowDom
+
+-> encapsulation: ViewEncapsulation.ShadowDom
+-> When we add inside in child component then the global style not applied in the component.
+-> 
+✔ Uses the browser’s real Shadow DOM (web components technology)
+✔ Completely isolates component styles
+✔ Styles cannot leak out, and outer styles cannot come in
+
+-> HTML becomes:
+
+<my-component>
+  #shadow-root
+    <h1>Inside Shadow DOM</h1>
+</my-component>
+
+-> Advantages:
+
+True isolation
+Best for Web Components
+Avoids global CSS problems
+
+-> Disadvantages:
+
+Some CSS features behave differently
+The Shadow DOM boundary blocks styles from outside
+
+3) None
+
+-> encapsulation: ViewEncapsulation.None
+-> If add this in parent then parent style apply in the child also
+
+-> 
+❌ No protection
+❌ Styles become global
+
+-> Meaning:
+Styles written in the component apply everywhere in the app.
+
+-> Use Cases:
+
+-When you want to apply a layout/framework stylesheet globally
+-When using Tailwind or Bootstrap custom overrides
+
+
+| Type                   | Behavior                             | Style Scope    | Use Case                         |
+| ---------------------- | ------------------------------------ | -------------- | -------------------------------- |
+| **Emulated** (default) | Angular adds attributes to scope CSS | Component only | Most apps                        |
+| **ShadowDom**          | Real Shadow DOM                      | Fully isolated | Web components, strict isolation |
+| **None**               | No scoping                           | Global styles  | When global CSS is needed        |
+
+
+**Note:
+
+1. If we applied encapsulation: ViewEncapsulation.None in parent component and applied encapsulation: ViewEncapsulation.ShadowDom in child component
+even the parent styles applied inside the child component.
+
+
+**------------------------------------------------------------------------------------------------**
 

@@ -13,6 +13,7 @@ import { HighlightDirective } from '../core/directives/highlight.directive';
 import { DisabledDirective } from '../core/directives/disabled.directive';
 import { ClassDirective } from '../core/directives/class.directive';
 import { StyleDirective } from '../core/directives/style.directive';
+import { IfDirective } from '../core/directives/if.directive';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { StyleDirective } from '../core/directives/style.directive';
     HighlightDirective,
     DisabledDirective,
     ClassDirective,
-    StyleDirective
+    StyleDirective,
+    IfDirective
   ],
   imports: [
     CommonModule,
