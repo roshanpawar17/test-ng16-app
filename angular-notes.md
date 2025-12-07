@@ -2002,6 +2002,275 @@ export class AppModule { }
 **Note: We can inject a service from Module class. In that case same instance of the dependency will be available throughtout the Angular Apllication.
 In this way we implement singleton pattern where a single instance is shared throughout the application.
 
+-------------------------------------------------------------------------
+
+# Injecting Service into another service
+
+Eg.
+
+- header.component.html
+
+<button  mat-raised-button color="primary" (click)="getDashBoardMessage()">Get Dashboard Message</button>
+
+- header.component.ts
+
+getDashBoardMessage() {
+  this.headerService.getDashBoardMessage();
+}
+
+- header.service.ts
+
+import { Injectable } from '@angular/core';
+import { DashboardService } from '../dashboard/dashboard.service';
+
+@Injectable() // - The class is Injectable class (means we can inject another services in this service)
+export class HeaderService {
+
+  constructor(private dashboardService: DashboardService) { }
+
+  getDashBoardMessage() {
+    this.dashboardService.logMessage(); 
+  }
+}
+
+- dashboard.component.ts
+
+import { Injectable } from '@angular/core';
+
+export class DashboardService {
+
+  constructor() { }
+
+  logMessage() {
+    console.log('Dashboard Message');
+  }
+}
+
+app.module.ts
+
+@NgModule({
+  providers: [NgThemeService, HeaderService, DashboardService]
+})
+export class AppModule { }
+
+Note: 
+
+1) If 
+
+@Injectable({
+  providedIn: 'root'
+}) 
+
+is not use in service then add service in module - 
+@NgModule({
+  providers: [NgThemeService, HeaderService, DashboardService]
+})
+export class AppModule { }
+
+
+-------------------------------------------------------------------------
+
+# Angular Injection Token
+
+-> Behide the seen angular add serive in pivides array like this
+
+app.module.ts
+
+providers: [
+  {
+    provide: HeaderService, // using type
+    useClass: HeaderService
+  }
+]
+
+-> Using string token
+
+app.module.ts
+
+providers: [
+  {
+    provide: 'HEADER_SERVICE',
+    useClass: HeaderService
+  }
+]
+
+header.component.ts
+
+export class HeaderComponent implements OnInit {
+
+  constructor(@Inject('HEADER_SERVICE') private headerService: HeaderService){}
+
+}
+
+-> Using unique injection token
+
+app.module.ts
+
+export const HEADER_SERVICE = new InjectionToken<HeaderService>('HEADER_SERVICE');
+
+providers: [
+  {
+    provide: HEADER_SERVICE,
+    useClass: HeaderService
+  }
+]
+
+header.component.ts
+
+import { HEADER_SERVICE } from 'src/app/app.module';
+
+export class HeaderComponent implements OnInit {
+
+  constructor(@Inject(HEADER_SERVICE) private headerService: HeaderService){}
+
+}
+
+
+🔥 What is an InjectionToken?
+
+InjectionToken is a special key that Angular uses to inject values or objects that are not classes.
+
+👉 Use it when you want to inject:
+✔ A constant value
+✔ A configuration object
+✔ A string/number
+✔ A function
+✔ Third-party data
+✔ Anything that is not a service class
+
+Why needed?
+
+Because Angular DI cannot identify non-class values.
+So you give Angular a “token” to recognize them.
+
+🧩 Simple Example
+
+Step 1: Create a token
+
+import { InjectionToken } from '@angular/core';
+
+export const API_URL = new InjectionToken<string>('api_url');
+
+Step 2: Provide the value
+
+providers: [
+  { provide: API_URL, useValue: 'https://api.example.com' }
+]
+
+Step 3: Inject into any service/component
+
+constructor(@Inject(API_URL) private apiUrl: string) {
+  console.log(this.apiUrl);
+}
+
+
+🧠 Why Not Just Use a Normal Constant?
+
+Because Angular DI works by types.
+If you pass this:
+
+providers: [
+  { provide: 'api_url', useValue: 'https://...' }
+]
+
+
+-> Using strings as tokens is dangerous:
+
+1. Typos → bugs
+2. No type safety
+3. Collisions with other tokens
+
+Using InjectionToken avoids all of these.
+
+🔥 Example with Full Flow (Beginner Friendly)
+
+1. Create token
+
+export const USER_ROLES = new InjectionToken<string[]>('user_roles');
+
+2. Provide value
+
+In module:
+
+providers: [
+  { provide: USER_ROLES, useValue: ['admin', 'editor', 'viewer'] }
+]
+
+3. Inject it
+
+In service:
+
+constructor(@Inject(USER_ROLES) private roles: string[]) {}
+
+printRoles() {
+  console.log(this.roles);
+}
+
+
+Output:
+
+["admin", "editor", "viewer"]
+
+----------------------------------------------------------
+
+# New way to inject service instead of constructor
+
+- header.component.ts
+
+export class HeaderComponent implements OnInit {
+
+  headerService = inject(HeaderService); // new way to inject service instead of constructor
+
+}
+
+----------------------------------------------------------
+
+# Without explicitly adding service in module privides array, use @Injectable({ providedIn: 'root' }) in service
+
+Don't use -
+
+@NgModule({
+  providers: [NgThemeService, 
+    {
+      provide: HEADER_SERVICE,
+      useClass: HeaderService
+    }, 
+    DashboardService
+  ]
+})
+
+Use below - 
+
+1)
+
+@Injectable({
+  providedIn: 'root'
+})
+export class HeaderService {
+
+  constructor() { }
+
+}
+
+2) 
+
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DashboardService {
+
+  constructor() { }
+
+  logMessage() {
+    console.log('Dashboard Message');
+  }
+}
+
+-------------------------------------------------------------------------
+
+# Component Interaction using Service
 
 ---------------------------------** RxJs **----------------------------------------
 

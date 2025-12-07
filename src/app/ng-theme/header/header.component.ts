@@ -1,5 +1,7 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output, Renderer2, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Inject, inject, Input, OnInit, Output, Renderer2, ViewEncapsulation } from '@angular/core';
 import { NgThemeService } from '../ng-theme.service';
+import { HeaderService } from './header.service';
+import { HEADER_SERVICE } from 'src/app/app.module';
 
 @Component({
   selector: 'app-header', // element-directive
@@ -20,7 +22,7 @@ export class HeaderComponent implements OnInit {
   
   renderer = inject(Renderer2);
 
-  constructor(public ngThemeService: NgThemeService){}
+  constructor(public ngThemeService: NgThemeService, @Inject(HEADER_SERVICE) private headerService: HeaderService){}
   
   ngOnInit(): void {
     // console.log('Title:', this.title);
@@ -49,5 +51,9 @@ export class HeaderComponent implements OnInit {
 
   testMeth(){
     console.log('testMeth called');
+  }
+
+  getDashBoardMessage() {
+    this.headerService.getDashBoardMessage();
   }
 }
