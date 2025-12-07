@@ -2268,10 +2268,6 @@ export class DashboardService {
   }
 }
 
--------------------------------------------------------------------------
-
-# Component Interaction using Service
-
 ---------------------------------** RxJs **----------------------------------------
 
 # What is an Observable
