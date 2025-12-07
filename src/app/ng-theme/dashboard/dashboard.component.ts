@@ -1,5 +1,7 @@
 import { AfterViewInit, Component, ElementRef, inject, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { NgThemeService } from '../ng-theme.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,7 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   //   <h2>Hello 2</h2>
   //   <h3>Hello 2</h3>
   // `,
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
   // styles: [
   //   `h1{
   //     color: red;
@@ -23,6 +25,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   //     color: orange;
   //   }`
   // ]
+  // providers: [NgThemeService]
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
 
@@ -40,6 +43,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   
   // case = 'r1';
   case = 1;
+
+  constructor(private ngThemeService: NgThemeService){}
 
   ngOnInit(): void {
     // const value = this.inputElement?.nativeElement?.value;
@@ -64,6 +69,45 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
     this.inputEl.forEach((el)=>{
       console.log('Input Element Value: ' + el.nativeElement.value);
+    });
+  }
+
+  subscribe() {
+    // const ngThemeSerive = new NgThemeService();
+    this.ngThemeService.onSubscribe();
+  }
+
+  addUser() {
+    this.ngThemeService.users.push('Omkar');
+    console.log(this.ngThemeService.users);
+  }
+
+  data: any[] = [];
+
+  myObservable = new Observable((observable) => {
+    // observable.next([1,2,3,4,5]);
+    setTimeout(() => observable.next(1), 1000);
+    setTimeout(() => observable.next(2), 2000);
+    setTimeout(() => observable.next(3), 3000);
+    // setTimeout(() => observable.error(new Error('Something went wrong')), 3000);
+    setTimeout(() => observable.next(4), 4000);
+    setTimeout(() => observable.next(5), 5000);
+    setTimeout(() => observable.complete(), 3000);
+  });
+
+  getData() {
+    this.myObservable.subscribe({
+      next: (res: any) => {
+        // this.data = res;
+        this.data.push(res);
+      },
+      error: (err) => {
+        console.log('Error ', err);
+        alert(err.message);
+      },
+      complete: () => {
+        alert('Data Completed');
+      }
     });
   }
 }

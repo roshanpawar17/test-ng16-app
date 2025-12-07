@@ -1,4 +1,5 @@
 import { Component, EventEmitter, inject, Input, OnInit, Output, Renderer2, ViewEncapsulation } from '@angular/core';
+import { NgThemeService } from '../ng-theme.service';
 
 @Component({
   selector: 'app-header', // element-directive
@@ -7,6 +8,7 @@ import { Component, EventEmitter, inject, Input, OnInit, Output, Renderer2, View
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   // encapsulation: ViewEncapsulation.ShadowDom
+  // providers: [NgThemeService]
 })
 export class HeaderComponent implements OnInit {
   
@@ -17,6 +19,8 @@ export class HeaderComponent implements OnInit {
   isActive: boolean = false;
   
   renderer = inject(Renderer2);
+
+  constructor(public ngThemeService: NgThemeService){}
   
   ngOnInit(): void {
     // console.log('Title:', this.title);

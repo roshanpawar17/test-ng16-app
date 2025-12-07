@@ -1771,3 +1771,444 @@ even the parent styles applied inside the child component.
 
 **------------------------------------------------------------------------------------------------**
 
+# What is Service
+
+-> A Service in Angular is a class used to share logic, data, or functions across multiple components.
+
+-> How to Create a Service
+
+ng generate service user
+
+🟦 Why Do We Need Services?
+
+Without services:
+
+❌ You will repeat the same code in multiple components
+❌ Sharing data between components becomes difficult
+❌ API calls would be written everywhere
+❌ Business logic stays in the component (bad practice)
+
+With services:
+
+✔ Reusable code
+✔ Cleaner components
+✔ Easy data sharing
+✔ Centralized API calls
+✔ Logic separated from UI
+
+
+-------------------------------------------------------------------------
+
+# Creating and Using Service - Creating instance explicitly
+
+* Dashboard Component 
+
+.html
+
+<button mat-flat-button color="primary" (click)="subscribe()">Header Subscribe Component</button>
+
+.ts
+
+subscribe() {
+  const ngThemeSerive = new NgThemeService();
+  ngThemeSerive.onSubscribe();
+}
+
+* ng-theme service
+
+export class NgThemeService {
+  currentTheme: string = 'light';
+
+  onSubscribe() {
+    alert('Theme subscription activated.');
+    console.log(`Subscribed to theme changes. Current theme is ${this.currentTheme}.`);
+  }
+}
+
+
+-------------------------------------------------------------------------
+
+# Dependency Injection
+
+-> A dependency is a relationship between two software components where one component relies on the other component to work properly.
+
+-> Dependency Injection (DI) in Angular is a system that automatically creates and provides objects (services, classes) wherever they are needed — so you don’t have to create them manually using new.
+
+-> Dependency Injection (DI) is a technique (design pattern) using which a class receives its dependencies from external source rather than creating them itself.
+
+-> You need UserService inside HomeComponent.
+
+Instead of: 
+- let service = new UserService(); // ❌ Don't do this in Angular
+
+You let Angular give it to you:
+- constructor(private userService: UserService) {}
+- Angular creates it, manages it, and injects it.
+
+-> 🧱 Why Do We Use Dependency Injection?
+
+✔ Avoid writing new Service() everywhere
+✔ Avoid duplicate instances
+✔ Easy to share one service instance across the app
+✔ Cleaner, testable, maintainable code
+✔ Loose coupling (components and services are not tightly connected)
+
+-> Eg.
+
+* Dashboard Component 
+
+.html
+
+<button mat-flat-button color="primary" (click)="subscribe()">Header Subscribe Component</button>
+
+.ts
+
+@Component({
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
+  providers: [NgThemeService] // Tell Angular what dependency we want / What to provide
+})
+export class DashboardComponent  {
+  constructor(private ngThemeService: NgThemeService){} // How to Inject Dependency
+
+  subscribe() {
+    this.ngThemeService.onSubscribe();
+  }
+}
+
+* ng-theme service
+
+export class NgThemeService {
+  currentTheme: string = 'light';
+
+  onSubscribe() {
+    alert('Theme subscription activated.');
+    console.log(`Subscribed to theme changes. Current theme is ${this.currentTheme}.`);
+  }
+}
+
+-------------------------------------------------------------------------
+
+# Hierarchical Dependency
+
+-> Hierarchical Injectors in Angular
+
+Angular uses multiple levels of dependency injectors, arranged in a tree structure, just like the component tree.
+
+-> Components and modules each have their own dependency injector. If a component asks for a service, Angular searches from the nearest injector upward until it finds it.
+
+-> Each component have different serive instance if have provide in provides array in component.
+
+-> Child component override the parent component instance. 
+
+-> Angular has multiple injectors, arranged like a hierarchy:
+
+Root Injector
+   |
+   |-- Module Injector
+          |
+          |-- Component Injector
+                 |
+                 |-- Child Component Injector
+
+-> Injector Levels
+
+Angular has mainly three DI levels:
+
+1. Root Injector (Global Level)
+
+Created when the application starts.
+
+@Injectable({
+  providedIn: 'root'
+})
+
+The service goes into the root injector → so one shared instance is used everywhere.
+
+This is the most common case.
+
+2. Module-level Injector
+
+If a module provides a service:
+
+@NgModule({
+  providers: [UserService]
+})
+export class AdminModule {}
+
+This creates a new instance of the service only when the module is loaded.
+
+Useful for lazy-loaded modules.
+
+3. Component-level Injector
+
+If you provide a service in a component:
+
+@Component({
+  selector: 'app-home',
+  providers: [UserService]
+})
+export class HomeComponent {}
+
+Then:
+
+  The component gets a new instance of the service.
+
+  All its child components also get that same instance.
+
+  Other components outside do not share it.
+
+-> How Angular Searches for Services
+
+When a component asks for a service:
+
+1. Look in its own injector
+2. If not found → look in parent component
+3. If not found → look in parent’s parent
+4. Continue until the root injector
+5. If still not found → error
+
+This is dependency resolution.
+
+-> Eg.
+
+app.module.ts
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+import { AppRoutingModule } from './app-routing.module';
+import { NgThemeService } from './ng-theme/ng-theme.service';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    DashboardComponent,
+    FrameLayoutComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    SharedModule
+  ],
+  providers: [NgThemeService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+**Note: We can inject a service from Module class. In that case same instance of the dependency will be available throughtout the Angular Apllication.
+In this way we implement singleton pattern where a single instance is shared throughout the application.
+
+
+---------------------------------** RxJs **----------------------------------------
+
+# What is an Observable
+
+-> An Observable is a special object that can send data over time.
+-> You can listen to that data by subscribing.
+-> We can use observable to handle asynchronouse data.
+
+----------------
+
+** What is synchronous programming?
+
+-> Javascript is a single-threaded programming language.
+-> The code is executed line by line one after the other in the order in which they are defined.
+
+----------------
+
+** What is asynchronous programming?
+
+-> Asynchronous code does not execute in single-threaded. It gets executed in the background.
+
+----------------
+
+** Why Do We Use Observables?
+
+Observables are useful when data is:
+
+✔ Coming asynchronously (later)
+✔ Coming multiple times
+✔ Coming continuously or streaming
+
+Examples:
+
+1. API calls
+2. User typing events
+3. Button clicks
+4. WebSocket live updates
+5. Form value changes
+6. Timers / intervals
+7. Route changes
+
+----------------
+
+-> Simple Example
+
+Create an observable:
+
+import { Observable } from 'rxjs';
+
+const obs = new Observable(observer => {
+  observer.next("Hello");
+  observer.next("World");
+  observer.complete();
+});
+
+Subscribe to it:
+
+obs.subscribe(value => {
+  console.log(value);
+});
+
+
+Output:
+
+Hello
+World
+
+
+🟩 Observable Terms
+
+1) Observable - Event Emitter
+  -> next() - Sends a value.
+  -> error() - Observable is finished.
+  -> complete() - Sends an error.
+
+2) Observer - Event Listner
+
+3) Handler - Event Handler
+  -> next()
+  -> error()
+  -> complete()
+
+
+🚀 Observables in Angular (Most Common Use)
+
+1. HttpClient returns Observables
+
+this.http.get('/api/users')
+  .subscribe(data => console.log(data));
+
+2. Form valueChanges is an observable
+
+this.form.valueChanges.subscribe(res => {
+  console.log(res);
+});
+
+
+3. Router Events are observables
+
+this.router.events.subscribe(event => {
+  console.log(event);
+});
+
+
+🟧 Key Features of Observables
+
+| Feature                | Explanation                     |
+| ---------------------- | ------------------------------- |
+| **Asynchronous**       | Data comes later                |
+| **Stream**             | Multiple values over time       |
+| **Lazy**               | Only runs when you subscribe    |
+| **Cancellable**        | You can unsubscribe             |
+| **Powerful operators** | debounceTime, map, filter, etc. |
+
+
+🧠 Promises vs Observables (Simple)
+
+| Promise               | Observable                    |
+| --------------------- | ----------------------------- |
+| Returns **one** value | Returns **many** values       |
+| Cannot be cancelled   | Can be cancelled              |
+| Eager                 | Lazy (runs only on subscribe) |
+| No operators          | 100+ RxJS operators           |
+
+
+⭐ Super Simple Explanation
+
+An Observable is like a YouTube Live Stream:
+Events keep coming, and you subscribe to watch them.
+
+A Promise is like a single YouTube video:
+You get one result only.
+
+🔥 Unsubscribe Example (Important)
+
+When using long-running observables:
+
+private sub: Subscription;
+
+ngOnInit() {
+  this.sub = this.service.data$.subscribe(...)
+}
+
+ngOnDestroy() {
+  this.sub.unsubscribe();
+}
+
+
+**Example:
+
+<button mat-flat-button color="primary" (click)="getData()">Get Data</button>
+
+<ng-container *ngFor="let d of data">
+  <div>{{ d }}</div>
+</ng-container>
+
+data: any[] = [];
+
+myObservable = new Observable((observable) => {
+  // observable.next([1,2,3,4,5]);
+  setTimeout(() => observable.next(1), 1000);
+  setTimeout(() => observable.next(2), 2000);
+  setTimeout(() => observable.next(3), 3000);
+  // setTimeout(() => observable.error(new Error('Something went wrong')), 3000);
+  setTimeout(() => observable.next(4), 4000);
+  setTimeout(() => observable.next(5), 5000);
+  setTimeout(() => observable.complete(), 3000);
+});
+
+getData() {
+  this.myObservable.subscribe({
+    next: (res: any) => {
+      // this.data = res;
+      this.data.push(res);
+    },
+    error: (err) => {
+      console.log('Error ', err);
+      alert(err.message);
+    },
+    complete: () => {
+      alert('Data Completed');
+    }
+  });
+}
+
+** Note:
+
+1) When Error is occured is goes to error block and after that data not getting emmited.
+
+Means, print 1 ,2, 3 and after that get error and 4, 5 not printed.
+
+setTimeout(() => observable.next(1), 1000);
+setTimeout(() => observable.next(2), 2000);
+setTimeout(() => observable.next(3), 3000);
+setTimeout(() => observable.error(new Error('Something went wrong')), 3000);
+setTimeout(() => observable.next(4), 4000);
+setTimeout(() => observable.next(5), 5000);
+
+2) When observable finished/stop is goes to complete block and after that data not getting emmited.
+
+Means, print 1, 2, 3 and after that get complete observable and 4, 5 not printed.
+
+setTimeout(() => observable.next(1), 1000);
+setTimeout(() => observable.next(2), 2000);
+setTimeout(() => observable.next(3), 3000);
+setTimeout(() => observable.next(4), 4000);
+setTimeout(() => observable.next(5), 5000);
+setTimeout(() => observable.complete(), 3000);
+

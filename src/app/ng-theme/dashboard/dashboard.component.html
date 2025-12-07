@@ -1,4 +1,4 @@
-<div class="dashboard-container">
+<!-- <div class="dashboard-container">
     <mat-drawer-container>
         <mat-drawer mode="side" opened>
             <mat-nav-list>
@@ -9,7 +9,7 @@
             </mat-nav-list>
         </mat-drawer>
         <mat-drawer-content>
-            <h2>List of People</h2>
+            <h2>List of People</h2> -->
 
             <!-- <mat-list role="list" class="mat-elevation-z8">
                 <ng-container *ngFor="let name of names; let i = index">
@@ -17,13 +17,13 @@
                 </ng-container>
             </mat-list> -->
 
-            <mat-list role="list" class="mat-elevation-z8">
+            <!-- <mat-list role="list" class="mat-elevation-z8">
                 <ng-template ngFor let-name [ngForOf]="names" let-i= index>
                     <mat-list-item> {{ name + ' ' + (i + 1)  }} </mat-list-item>
                 </ng-template>
             </mat-list>
 
-            <button mat-flat-button color="primary" (click)="save()">Save</button>
+            <button mat-flat-button color="primary" (click)="save()">Save</button> -->
 
             <!-- <div [ngSwitch]="case">
                 <p *ngSwitchCase="'r1'">Roshan</p>
@@ -32,15 +32,15 @@
                 <p *ngSwitchCase="'r2'">Raj</p>
             </div> -->
 
-            <div [ngSwitch]="case">
+            <!-- <div [ngSwitch]="case">
                 <p *ngSwitchCase="1">Roshan</p>
                 <p *ngSwitchCase="2">Omkar</p>
                 <p *ngSwitchCase="3">Harsh</p>
                 <p *ngSwitchCase="4">Raj</p>
-            </div>
+            </div> -->
 
             <!-- app.component.html -->
-            <input #myInput type="text" placeholder="Enter name">
+            <!-- <input #myInput type="text" placeholder="Enter name">
             <button (click)="showValue()">Show Input Value</button>
 
             <br><br>
@@ -79,4 +79,25 @@
 
         </mat-drawer-content>
     </mat-drawer-container>
-</div>
+</div> -->
+
+<button mat-flat-button color="primary" (click)="subscribe()">Header Subscribe Component</button>
+<br><br>
+<button mat-flat-button color="primary" (click)="addUser()">Add User</button>
+
+<br>
+<br>
+
+<button mat-flat-button color="primary" (click)="getData()">Get Data</button>
+
+<ng-container *ngFor="let d of data">
+    <div>{{ d }}</div>
+</ng-container>
+
+<!-- <ng-template ngFor let-d [ngForOf]="data">
+    <div>{{d}}</div>
+</ng-template>
+<ng-template *ngFor="let d of data">
+    <div>{{d}}</div>
+</ng-template> -->
+

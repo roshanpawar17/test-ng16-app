@@ -8,6 +8,7 @@ import { SharedModule } from './shared/shared.module';
 import { HeaderComponent } from './ng-theme/header/header.component';
 import { DashboardComponent } from './ng-theme/dashboard/dashboard.component';
 import { FrameLayoutComponent } from './ng-theme/frame-layout/frame-layout.component';
+import { NgThemeService } from './ng-theme/ng-theme.service';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,7 @@ import { FrameLayoutComponent } from './ng-theme/frame-layout/frame-layout.compo
     BrowserAnimationsModule,
     SharedModule
   ],
-  providers: [],
+  providers: [NgThemeService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
