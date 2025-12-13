@@ -1,19 +1,30 @@
-import { Observable, Subject } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 
 export class NgThemeService {
     currentTheme: string = 'light';
 
     users: string[] = ['Roshan'];
 
-    // private refreshSubject = new Subject<number>();
-    // refresh$ = this.refreshSubject.asObservable();
+    private refreshSubject = new Subject<number>();
+    refresh$ = this.refreshSubject.asObservable();
 
-    refresh = new Observable((observer) => {
-        observer.next(Math.random())
-    })
+    private isLoggedInSubject = new BehaviorSubject<boolean>(false);
+    isLoggedIn$ = this.isLoggedInSubject.asObservable();
+
+    login() {
+        this.isLoggedInSubject.next(true);
+    }
+
+    logout() {
+        this.isLoggedInSubject.next(false);
+    }
+
+    // refresh = new Observable((observer) => {
+    //     observer.next(Math.random())
+    // })
 
     triggerRefresh() {
-        // this.refreshSubject.next(Math.random());
+        this.refreshSubject.next(Math.random());
     }
 
     onSubscribe() {

@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, inject, Inp
 import { NgThemeService } from '../ng-theme.service';
 import { HeaderService } from './header.service';
 import { HEADER_SERVICE } from 'src/app/app.module';
-import { debounceTime, filter, from, fromEvent, map, of, Subject } from 'rxjs';
+import { AsyncSubject, BehaviorSubject, debounceTime, filter, from, fromEvent, map, Observable, of, ReplaySubject, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-header', // element-directive
@@ -102,15 +102,88 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     // subject.subscribe({
     //   next: (v) => {console.log('Sub 3: ', v)}
     // })
-    this.ngThemeService.refresh.subscribe((res) => {
-      console.log('Refresh triggered 1' , res);
+    // this.ngThemeService.refresh$.subscribe((res) => {
+    //   console.log('Refresh triggered 1' , res);
+    // });
+
+    // this.ngThemeService.refresh$.subscribe((res) => {
+    //   console.log('Refresh triggered 2' , res);
+    // });
+
+    // this.ngThemeService.triggerRefresh();
+
+    // const count$ = new BehaviorSubject<number>(0);
+
+    // count$.subscribe(v => console.log('A', v));
+    // count$.subscribe(v => console.log('B', v));
+
+    // count$.next(1);
+    // count$.next(2);
+
+    // count$.subscribe(v => console.log('C', v));
+    // const cuurentVal = count$.getValue();
+    // console.log('curr val ', cuurentVal);
+
+    // this.ngThemeService.isLoggedIn$.subscribe(isLoggedIn => {
+    //   console.log('login ', isLoggedIn);
+    // });
+
+    // this.ngThemeService.login();
+
+    // const rs = new ReplaySubject<number>(2);
+
+    // rs.subscribe(v => console.log('Sub A ', v));
+    // rs.subscribe(v => console.log('Sub B ', v));
+
+    // rs.next(1);
+    // rs.next(2);
+    // rs.next(3);
+
+    // rs.subscribe(v => console.log('Sub C ', v));
+
+    // rs.next(4);
+
+
+    // const rs = new ReplaySubject<number>(2, 3000)
+    // rs.next(1);
+    // setTimeout(() => rs.next(2), 1000);
+    // setTimeout(() => rs.next(3), 6000);
+
+    // rs.subscribe(console.log);
+
+    // const as = new AsyncSubject<number>();
+
+    // as.subscribe(v => console.log('A:', v));
+
+    // as.next(1);
+    // as.next(2);
+    // as.next(3);
+
+    // as.subscribe(v => console.log('B:', v));
+
+    // as.complete();
+
+    // as.next(4);
+
+    // as.subscribe(v => console.log('C:', v));
+
+    const promise = new Promise((resolve, reject) => {
+      console.log('Promise is Created');
+      resolve(100);
+      resolve(200);
+      resolve(300);
     });
 
-    this.ngThemeService.refresh.subscribe((res) => {
-      console.log('Refresh triggered 2' , res);
-    });
+    promise.then((val)=>{
+      console.log(val)
+    })
 
-    this.ngThemeService.triggerRefresh();
+    const ob = new Observable((observer) => { 
+      observer.next(100); 
+      observer.next(200); 
+      observer.next(300); 
+    });
+    ob.subscribe((val) => console.log('val ', val));
 
   }
   

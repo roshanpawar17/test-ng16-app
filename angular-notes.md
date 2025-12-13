@@ -2978,3 +2978,414 @@ private subject = new BehaviorSubject<User | null>(null);
 public user$ = this.subject.asObservable();
 
 Expose Observable, keep Subject private
+
+-----------------------------------------------------------------
+
+# BehaviorSubject
+
+✅ What is a BehaviorSubject?
+
+1. A BehaviorSubject is a special type of Subject that:
+2. Requires an initial value
+3. Always stores the latest value
+4. Immediately emits the latest value to new subscribers
+
+👉 Think of it as:
+
+“I always remember the last value and give it to anyone who subscribes.”
+
+🔁 BehaviorSubject vs Subject (Quick)
+
+| Feature                               | Subject | BehaviorSubject |
+| ------------------------------------- | ------- | --------------- |
+| Initial value required                | ❌ No    | ✅ Yes           |
+| Emits latest value to new subscribers | ❌ No    | ✅ Yes           |
+| Stores current value                  | ❌ No    | ✅ Yes           |
+| Common in Angular                     | ⚠️ Less | ⭐ Very common   |
+
+
+📌 Basic Example
+
+import { BehaviorSubject } from 'rxjs';
+
+const count$ = new BehaviorSubject<number>(0);
+
+count$.subscribe(v => console.log('A:', v));
+count$.subscribe(v => console.log('B:', v));
+
+count$.next(1);
+count$.next(2);
+
+count$.subscribe(v => console.log('C:', v));
+
+// output
+
+A: 0
+B: 0
+A: 1
+B: 1
+A: 2
+B: 2   
+C: 2   👈 latest value immediately
+
+🧠 Why Initial Value Is Required?
+
+Because BehaviorSubject must always have a value to emit.
+
+new BehaviorSubject(null); // valid
+new BehaviorSubject();     // ❌ error
+
+🔥 Access Current Value (Important)
+
+const cuurentVal = count$.getValue();
+console.log('curr val ', cuurentVal); // returns latest value
+
+⚠️ Use carefully (avoid in components).
+
+------------------------
+
+🧪 Angular Real-Life Example (Most Common)
+
+Auth / Login State
+
+auth.service.ts
+
+private isLoggedInSubject = new BehaviorSubject<boolean>(false);
+isLoggedIn$ = this.isLoggedInSubject.asObservable();
+
+login() {
+  this.isLoggedInSubject.next(true);
+}
+
+logout() {
+  this.isLoggedInSubject.next(false);
+}
+
+.component
+
+ngOnInit() {
+  this.ngThemeService.isLoggedIn$.subscribe(isLoggedIn => {
+    console.log('login ', isLoggedIn);
+  });
+
+  this.ngThemeService.login();
+}
+
+⚠️ Best Practices
+
+✔️ Keep BehaviorSubject private
+✔️ Expose as Observable using asObservable()
+✔️ Use meaningful initial values
+
+private userSubject = new BehaviorSubject<User | null>(null);
+user$ = this.userSubject.asObservable();
+
+🎯 Simple Summary
+
+1. BehaviorSubject = Subject + memory
+2. Always has a value
+3. Emits latest value to new subscribers
+4. Most used Subject in Angular apps
+
+----------------------------------------------------------------------------
+
+# ReplaySubject
+
+✅ What is a ReplaySubject?
+
+- A ReplaySubject is a type of Subject that:
+- Remembers previous values
+- Replays them to new subscribers
+
+👉 Think of it as:
+
+“When someone subscribes late, replay the past values.”
+
+🔁 ReplaySubject vs Subject vs BehaviorSubject
+
+| Feature                | Subject  | BehaviorSubject  | ReplaySubject      |
+| ---------------------- | -------  | ---------------  | -----------------  |
+| Requires initial value | ❌ No    | ✅ Yes           | ❌ No              |
+| Replays past values    | ❌ No    | ✅ (latest only) | ✅ (multiple)      |
+| New subscriber gets    | Nothing  | Last value       | Last **N** values  |
+| Stores history         | ❌ No    | 1 value          | Many values        |
+
+
+📌 Basic Example
+
+1) 
+
+import { ReplaySubject } from 'rxjs';
+
+const rs = new ReplaySubject<number>(2); // buffer size = 2
+
+rs.next(1);
+rs.next(2);
+rs.next(3);
+
+rs.subscribe(v => console.log(v));
+
+// Output
+
+2
+3
+
+2)
+
+const rs = new ReplaySubject<number>();
+
+rs.subscribe(v => console.log('Sub A ', v));
+rs.subscribe(v => console.log('Sub B ', v));
+
+rs.next(1);
+rs.next(2);
+
+rs.subscribe(v => console.log('Sub C ', v));
+
+rs.next(3);
+
+// Output
+
+Sub A  1
+Sub B  1
+Sub A  2
+Sub B  2
+Sub C  1
+Sub C  2
+Sub A  3
+Sub B  3
+Sub C  3
+
+⚠️ This stores ALL values forever → memory leak risk.
+
+3)
+
+const rs = new ReplaySubject<number>(2); // buffer size = 2
+
+rs.subscribe(v => console.log('Sub A ', v));
+rs.subscribe(v => console.log('Sub B ', v));
+
+rs.next(1);
+rs.next(2);
+rs.next(3);
+
+rs.subscribe(v => console.log('Sub C ', v));
+
+rs.next(4);
+
+// output
+
+Sub A  1
+Sub B  1
+Sub A  2
+Sub B  2
+Sub A  3
+Sub B  3
+Sub C  2
+Sub C  3
+Sub A  4
+Sub B  4
+Sub C  4
+
+➡️ Last 2 values are replayed.
+
+4) 
+
+⏱ ReplaySubject with Time Window
+
+const rs = new ReplaySubject<number>(2, 3000); // last 2 values in 3 sec
+
+rs.next(1);
+setTimeout(() => rs.next(2), 1000);
+setTimeout(() => rs.next(3), 4000);
+
+rs.subscribe(console.log);
+
+// output
+
+1
+2
+3
+
+print all values timer not working
+
+➡️ Only values from last 3 seconds are replayed.
+
+🎯 Simple Summary
+
+1. ReplaySubject = Subject + history
+2. Replays last N values
+3. Useful for caching & late subscribers
+4. Limit buffer size to avoid memory issues
+
+------------------------------------------------------------
+
+# AsyncSubject
+
+✅ What is an AsyncSubject?
+
+An AsyncSubject is a special type of Subject that:
+
+- Emits only the LAST value
+- Emits it ONLY when complete() is called
+- All subscribers get the SAME final value
+
+👉 Think of it as:
+
+“Wait until the work is finished, then give everyone the final result.”
+
+📌 Basic Example
+
+import { AsyncSubject } from 'rxjs';
+
+const as = new AsyncSubject<number>();
+
+as.subscribe(v => console.log('A:', v));
+
+as.next(1);
+as.next(2);
+as.next(3);
+
+as.subscribe(v => console.log('B:', v));
+
+as.complete();
+
+as.next(4);
+
+as.subscribe(v => console.log('C:', v));
+
+// output
+
+A: 3
+B: 3
+C: 3
+
+➡️ Only the last value (3) is emitted
+➡️ Emission happens after complete()
+
+❗ Important Rule (Very Important)
+
+❌ No complete() → NO emission
+
+as.next(100);
+// no output because complete() not called
+
+🧠 Real-World Use Case
+✔️ One-time operation where only final result matters
+
+Examples:
+
+1. File upload completion
+2. Final API result
+3. Initialization process
+4. Cleanup tasks
+
+🆚 AsyncSubject vs BehaviorSubject
+
+| Feature           | AsyncSubject      | BehaviorSubject |
+| ----------------- | ---------------   | --------------- |
+| Emits immediately | ❌ No             | ✅ Yes          |
+| Emits on complete | ✅ Yes            | ❌ No           |
+| Stores value      | Final only        | Latest          |
+| Use case          | One-time result   | App state       |
+
+⚠️ When NOT to use AsyncSubject
+
+❌ Continuous data streams
+❌ Live updates
+❌ UI state
+❌ Events
+
+✅ Final Summary
+
+1. Emits only last value
+2. Emits only after complete()
+3. All subscribers get same result
+4. Perfect for one-time async operations
+
+-------------------------------------------------------------------
+
+# Promise vs Observable
+
+1. Promise is native to JS. 
+
+const promise = new Promise((resolve, reject) => {});
+
+-> means no need to import Promise from another third part library.
+
+1. An observable is not native to JS. It is prividede by third party RxJS library. 
+
+import { Observable } from 'rxjs';
+
+const ob = new Observable((observer) => { observer.next(100) })
+
+-> means Need to import from third party library.
+
+--------------
+
+2. Promise is eager. It returns the data as soon as a promise is created.
+
+const promise = new Promise((resolve, reject) => {
+  console.log('Promise is Created');
+  resolve(100);
+});
+
+-> print 'Promise is Created' when promise is create as soon as.
+
+2. Observable is lazy. It only emits the data if there is a subscriber for that observable.
+
+const ob = new Observable((observer) => { 
+  console.log('Observable is created') 
+});
+ob.subsribe((val) => {});
+
+// output
+
+-> print 'Observable is created' when only subscribe to ob
+
+---------------
+
+3. Promise can emit only single value.
+
+const promise = new Promise((resolve, reject) => {
+  resolve(100);
+  resolve(200);
+  resolve(300);
+});
+
+promise.then((val)=>{
+  console.log(val)
+})
+
+// output
+
+100
+
+3. Observable can emit single or multiple values.
+
+const ob = new Observable((observer) => { 
+  observer.next(100); 
+  observer.next(200); 
+  observer.next(300); 
+});
+ob.subscribe((val) => console.log('val ', val));
+
+// output
+
+100
+200
+300
+
+--------------
+
+4. Promise has methods for success & error.
+4. Observable has methods for success, error and completion,
+
+--------------
+
+5. Promise always returns asynchronuos data.
+5.  An observable can return both syncronous and asynchrous data based on how it is implemented
+
+-----------------------------------------------------------------------------
+
+
