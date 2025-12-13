@@ -1,7 +1,20 @@
+import { Observable, Subject } from "rxjs";
+
 export class NgThemeService {
     currentTheme: string = 'light';
 
     users: string[] = ['Roshan'];
+
+    // private refreshSubject = new Subject<number>();
+    // refresh$ = this.refreshSubject.asObservable();
+
+    refresh = new Observable((observer) => {
+        observer.next(Math.random())
+    })
+
+    triggerRefresh() {
+        // this.refreshSubject.next(Math.random());
+    }
 
     onSubscribe() {
         alert('Theme subscription activated.');

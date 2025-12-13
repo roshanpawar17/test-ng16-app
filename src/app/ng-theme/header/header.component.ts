@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Inject, inject, Input, OnInit, Output, Renderer2, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, inject, Input, OnInit, Output, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NgThemeService } from '../ng-theme.service';
 import { HeaderService } from './header.service';
 import { HEADER_SERVICE } from 'src/app/app.module';
+import { debounceTime, filter, from, fromEvent, map, of, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-header', // element-directive
@@ -12,7 +13,7 @@ import { HEADER_SERVICE } from 'src/app/app.module';
   // encapsulation: ViewEncapsulation.ShadowDom
   // providers: [NgThemeService]
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, AfterViewInit {
   
   @Input() title: string = 'Default Title';
   @Output() toggleSidenav = new EventEmitter<any>();
@@ -26,7 +27,93 @@ export class HeaderComponent implements OnInit {
   
   ngOnInit(): void {
     // console.log('Title:', this.title);
+
+    // const ofOp = of(1, 2, 3)
+    // const ofOp = of([1, 2, 3])
+    const ofOp = from([1, 2, 3])
+
+    ofOp.subscribe({
+      next: (res) => {
+        // console.log(res)
+      }
+    });
+
+    const p = Promise.resolve('Hello');
+    // from(p).subscribe(console.log);
+
+    // from('ABC').subscribe(console.log);
+
+
   }
+  @ViewChild('myBtn') myBtnEl!: ElementRef<any>;
+  @ViewChild('myInput') myInputEl!: ElementRef<any>;
+
+  ngAfterViewInit(): void {
+    // const myBtn = document.getElementById('myBtn') as HTMLButtonElement;
+    // fromEvent(myBtn, 'click').subscribe({
+    //   next: (res) => {
+    //     console.log('button clicked ', res);
+    //   }
+    // });
+
+    // fromEvent(this.myBtnEl.nativeElement, 'click').subscribe({
+    //   next: (res) => {
+    //     console.log('button clicked ', res);
+    //   }
+    // });
+
+    // fromEvent(this.myInputEl.nativeElement, 'keyup').pipe(debounceTime(300)).subscribe({
+    //   next: (res) => {
+    //     console.log('keyup', res);
+    //   }
+    // });
+
+    // fromEvent(window, 'scroll').subscribe(() => {
+    //   console.log('Scrolling');
+    // });
+
+    // of([1,2,3]).pipe(map(x=>x.map(x=>x*2))).subscribe(console.log);
+    // from([1,2,3]).pipe(map(x=>x*2)).subscribe(console.log);
+
+    // of(1,2,3,4,5,6).pipe(filter(x=>x%2===0)).subscribe(console.log)
+    // from([1,2,3,4,5,6]).pipe(filter(x=>x%2===0)).subscribe(console.log);
+
+    // of(
+    //   { name: 'A', age: 15 },
+    //   { name: 'B', age: 22 },
+    //   { name: 'C', age: 30 }
+    // ).pipe(
+    //   filter(x => x.age > 20),
+    //   map(x => x.name)
+    // ).subscribe(console.log);
+
+    // const subject = new Subject<number>();
+
+    // subject.subscribe({
+    //   next: (v) => {console.log('Sub 1: ', v)}
+    // })
+    // subject.subscribe({
+    //   next: (v) => {console.log('Sub 2: ', v)}
+    // })
+
+    // subject.next(1);
+    // subject.next(2);
+
+    // subject.subscribe({
+    //   next: (v) => {console.log('Sub 3: ', v)}
+    // })
+    this.ngThemeService.refresh.subscribe((res) => {
+      console.log('Refresh triggered 1' , res);
+    });
+
+    this.ngThemeService.refresh.subscribe((res) => {
+      console.log('Refresh triggered 2' , res);
+    });
+
+    this.ngThemeService.triggerRefresh();
+
+  }
+  
 
   setTheme(isdark: boolean) {
     if (isdark) {
