@@ -11,6 +11,7 @@ import { FrameLayoutComponent } from './ng-theme/frame-layout/frame-layout.compo
 import { NgThemeService } from './ng-theme/ng-theme.service';
 import { HeaderService } from './ng-theme/header/header.service';
 import { DashboardService } from './ng-theme/dashboard/dashboard.service';
+import { ReactiveFormsModule } from '@angular/forms';
 
 export const HEADER_SERVICE = new InjectionToken<HeaderService>('HEADER_SERVICE');
 
@@ -25,7 +26,8 @@ export const HEADER_SERVICE = new InjectionToken<HeaderService>('HEADER_SERVICE'
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    SharedModule
+    SharedModule,
+    ReactiveFormsModule
   ],
   providers: [NgThemeService, 
     {
