@@ -22,6 +22,99 @@
 
 **------------------------------------------------------------------------------------------------**
 
+# Angular Folder Structure
+
+1) package.json :
+
+1️⃣ What is package.json? (Big Picture)
+
+-> package.json is the identity card + dependency manager + command center of your Angular project.
+
+It tells:
+
+  📦 What your project is
+  🔗 Which libraries it depends on
+  🧪 Which scripts/commands can be run
+  ⚙️ How the project behaves with Node/NPM
+
+Angular itself cannot run without package.json.
+
+-----------------------------------------------
+
+2️⃣ A Typical Angular package.json
+
+Example (simplified):
+
+{
+  "name": "my-angular-app",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "ng serve",
+    "build": "ng build",
+    "test": "ng test",
+    "lint": "ng lint"
+  },
+  "dependencies": {
+    "@angular/core": "^17.0.0",
+    "@angular/common": "^17.0.0",
+    "rxjs": "~7.8.0",
+    "zone.js": "~0.14.0"
+  },
+  "devDependencies": {
+    "@angular/cli": "^17.0.0",
+    "typescript": "~5.3.0"
+  }
+}
+
+-----------------------------------------------
+
+-> Now let’s deep dive into every section.
+
+3️⃣ name
+
+"name": "my-angular-app"
+
+Purpose:
+
+  1. Project name
+  2. Used by npm
+  3. Used when publishing a package (libraries)
+
+Rules:
+
+  ✅ lowercase
+  ❌ no spaces
+  ❌ no special characters except -
+
+Real-world note:
+
+  For Angular applications, this is mostly informational.
+  For Angular libraries, it becomes very important.
+
+------------------------
+
+4️⃣ version
+
+"version": "0.0.1"
+
+Purpose:
+
+Uses Semantic Versioning: MAJOR.MINOR.PATCH
+
+Example:
+
+  1.0.0 → stable release
+  1.1.0 → new feature
+  1.1.1 → bug fix
+
+In Angular apps:
+
+  Mostly not critical unless you publish the app as a package
+  Still useful for tracking releases
+
+**------------------------------------------------------------------------------------------------**
+
 
 # View template of component
 
