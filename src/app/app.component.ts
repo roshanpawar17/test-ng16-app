@@ -28,6 +28,7 @@ export class AppComponent {
             if (bodyContent && typeof bodyContent === 'string') {
               if (contentType.includes('application/json')) {
                 console.log('Raw payload ', JSON.parse(bodyContent));
+                console.log('Raw payload ', JSON.parse(bodyContent));
               }  else if (contentType.includes('multipart/form-data')) {
                 const multipartData = this.parseMultipartFormData(bodyContent, contentType);
                 console.log('Form data payload ', multipartData);
@@ -53,17 +54,17 @@ export class AppComponent {
     const result = {};
 
     // extract boundary
-    const boundaryMatch = contentType.match(/boundary=(.+)$/);
+    const boundaryMatch = contentType?.match(/boundary=(.+)$/);
     if (!boundaryMatch) return result;
 
-    const boundary = boundaryMatch[1];
+    const boundary = boundaryMatch?.[1];
 
     // normalize escaped newlines
     const normalizedBody = body
       ?.replace(/^[$]/, '')     // remove leading $
       ?.replace(/\\r\\n/g, '\r\n');
 
-    const parts = normalizedBody.split(`--${boundary}`);
+    const parts = normalizedBody?.split(`--${boundary}`);
 
     for (const part of parts) {
       if (!part || part === '--\r\n') continue;
@@ -71,7 +72,7 @@ export class AppComponent {
       const nameMatch = part?.match(/name="([^"]+)"/);
       if (!nameMatch) continue;
 
-      const name = nameMatch[1];
+      const name = nameMatch?.[1];
 
       const valueMatch = part?.split('\r\n\r\n');
       if (valueMatch?.length < 2) continue;
