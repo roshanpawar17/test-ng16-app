@@ -1060,7 +1060,6 @@ Plugins optimize output
    ↓
 Dev Server serves bundles
 
-
 ---------------------------------------------------
 
 🏗 build
@@ -1071,6 +1070,200 @@ Dev Server serves bundles
   Minifies & optimizes code
   command: npm run build
   You can also do: npm run build -- --configuration=production
+
+🏗️ How ng build Works Internally (Deep Dive)
+
+When you run:
+
+ng build
+
+you’re telling Angular:
+
+  “Compile my app, optimize it, and generate deployable files.”
+
+This is a production-oriented pipeline, not a dev one.
+
+1️⃣ Angular CLI Takes Control
+
+Just like ng serve, everything starts with Angular CLI.
+
+  Terminal → Angular CLI (Node.js)
+
+CLI:
+
+  Parses the command
+  Resolves flags (--configuration, --prod)
+  Determines which project to build
+
+2️⃣ Angular CLI Reads Configuration
+
+🔹 angular.json (Critical)
+
+CLI reads:
+
+  "build": {
+    "builder": "@angular-devkit/build-angular:browser"
+  }
+
+This builder is different from ng serve.
+
+| Command  | Builder    |
+| -------- | ---------- |
+| ng serve | dev-server |
+| ng build | browser    |
+
+👉 This builder is designed for production builds.
+
+🔹 Environment Configuration
+
+By default:
+
+  ng build
+
+Uses:
+
+  environment.ts
+
+For production:
+
+  ng build --configuration=production
+
+Uses:
+
+  environment.prod.ts
+
+3️⃣ Dependency Resolution & Graph Creation
+
+Webpack starts from:
+
+  src/main.ts
+
+Then:
+
+  Follows all imports
+  Builds full dependency graph
+
+Includes:
+
+  Components
+  Modules
+  Services
+  Assets
+  Styles
+
+This graph defines what must be bundled.
+
+4️⃣ TypeScript Compilation (Strict Mode)
+Key Difference from ng serve
+
+ng build:
+
+  Uses full TypeScript compilation
+  Enforces stricter checks
+  Fails on type errors
+
+This ensures:
+
+  No broken types reach production
+
+5️⃣ AOT Compilation (Huge Difference ⚠️)
+
+By default:
+  ng build → AOT enabled
+
+That means:
+
+  Templates compiled at build time
+  No template compilation in browser
+  Faster runtime
+  Smaller bundles
+
+Angular compiler:
+
+  Converts templates to JS instructions
+  Resolves DI at build time
+  Removes unused metadata
+
+6️⃣ Tree Shaking (Dead Code Elimination)
+
+Webpack + Angular compiler:
+
+  Analyze dependency graph
+  Remove unused code
+
+Example:
+
+  import { A, B } from 'lib';
+  // only A used
+
+Result:
+
+  B is removed
+  Smaller bundle
+
+This is critical for performance.
+
+7️⃣ Code Splitting
+
+Angular splits bundles automatically:
+
+| Bundle         | Purpose         |
+| -------------- | --------------- |
+| `main.js`      | App code        |
+| `runtime.js`   | Webpack runtime |
+| `polyfills.js` | Browser support |
+| `styles.css`   | Global styles   |
+
+8️⃣ Hashing for Cache Busting
+
+Filenames include hashes:
+
+  main.8d9f3c2.js
+
+Why?
+
+  Browser cache invalidation
+  New build → new filename
+
+1️⃣1️⃣ Output Written to Disk
+
+Unlike ng serve:
+
+  Files are written to disk
+  Located in dist/
+
+This output:
+
+  Can be deployed
+  Served by Nginx, Apache, CDN
+
+🔥 High-Level Build Flow (Mental Model)
+
+ng build
+  ↓
+Angular CLI
+  ↓
+Browser Builder
+  ↓
+Webpack
+  ↓
+TypeScript + AOT
+  ↓
+Optimizations & Tree Shaking
+  ↓
+Bundle Splitting
+  ↓
+Write files to dist/
+
+🎯 Key Differences: ng serve vs ng build
+
+| Feature      | ng serve   | ng build  |
+| ------------ | --------   | --------  |
+| Output       | Memory     | Disk      |
+| AOT          | ❌         | ✅        |
+| Optimization | ❌         | ✅        |
+| Live reload  | ✅         | ❌        |
+
 
 🧪 test
 
@@ -1095,10 +1288,422 @@ Custom Scripts (Real World Example)
   }
 
 
+7️⃣ What are dependencies?
+
+Dependencies are external packages that an application requires at runtime in order to execute correctly in development, production, or any deployed environment.
+
+Short version:
+
+  If a package is missing from dependencies, your app will break when it runs.
+
+2️⃣ Why dependencies Exist
+
+JavaScript applications:
+
+  Don’t ship with the browser
+  Don’t have standard libraries like Java / .NET
+
+So we import functionality from packages:
+
+  Angular framework
+  RxJS
+  Utility libraries
+
+These must be present when the app is running.
+
+3️⃣ dependencies vs devDependencies (Conceptual Difference)
+
+| Aspect               | dependencies   | devDependencies     |
+| -------------------- | ------------   | -----------------   |
+| Needed at runtime    | ✅ Yes         | ❌ No               |
+| Needed in production | ✅ Yes         | ❌ No               |
+| Shipped with app     | ✅ Yes         | ❌ No               |
+| Used by browser      | ✅ Yes         | ❌ No (build only)  |
+
+5️⃣ What Should NEVER Go Into dependencies
+
+  ❌ Testing libraries
+  ❌ Build tools
+  ❌ CLI tools
+  ❌ Linters
+
+Examples:
+
+  "typescript"
+  "@angular/cli"
+  "eslint"
+  "karma"
+
+These belong in devDependencies.
+
+6️⃣ How npm Uses dependencies Internally
+
+When you run:
+
+  npm install
+
+npm:
+
+  Reads package.json
+  Installs all dependencies
+  Resolves sub-dependencies
+  Creates node_modules
+
+Then:
+
+  ng serve
+  ng build
+  node app.js
+
+can run correctly.
+
+7️⃣ What Happens If a Runtime Dependency Is Missing?
+
+Example:
+
+  import { Component } from '@angular/core';
+
+If @angular/core is not in dependencies:
+
+  ❌ Build fails
+  ❌ Runtime crashes
+  ❌ App won’t start
+
+8️⃣ Angular Production Build & dependencies
+
+During:
+
+  ng build --configuration=production
+
+Angular:
+
+  Bundles only used dependencies
+  Tree-shakes unused code
+  Optimizes final output
+  But only from dependencies.
+
+9️⃣ Why dependencies Are Critical in Deployment
+
+In real servers:
+
+  CI/CD runs npm install --production
+  Only dependencies are installed
+  devDependencies are skipped
+
+If runtime lib is wrongly placed in devDependencies:
+
+  🚨 App crashes in production
+
+🔥 Real-World Failure Example
+
+"devDependencies": {
+  "rxjs": "~7.8.0"
+}
+
+Works locally ❌
+Fails in production 🚨
+
+Because:
+
+  CI installs only dependencies
+  RxJS missing
+
+🔹 Angular dependencies — Deep Explanation (One by One)
+
+"dependencies": {
+  "@angular/animations": "^16.2.0",
+  "@angular/cdk": "^16.2.14",
+  "@angular/common": "^16.2.0",
+  "@angular/compiler": "^16.2.0",
+  "@angular/core": "^16.2.0",
+  "@angular/forms": "^16.2.0",
+  "@angular/material": "^16.2.14",
+  "@angular/platform-browser": "^16.2.0",
+  "@angular/platform-browser-dynamic": "^16.2.0",
+  "@angular/router": "^16.2.0",
+  "rxjs": "~7.8.0",
+  "tslib": "^2.3.0",
+  "zone.js": "~0.13.0"
+}
+
+1️⃣ @angular/core — ❤️ The Heart of Angular
+
+"@angular/core": "^16.2.0"
+
+What it is?
+
+  The core framework of Angular.
+
+What it provides?
+
+  Component, Directive, Pipe
+  Dependency Injection
+  Change Detection
+  Lifecycle hooks
+  Signals (Angular 16+)
+
+Without it
+
+  ❌ Angular cannot start
+  ❌ App will not compile
+
+This is the brain of Angular
+
+2️⃣ @angular/common — 🧱 Common Building Blocks
+
+"@angular/common": "^16.2.0"
+
+What it provides?
+
+Common directives:
+
+  *ngIf
+  *ngFor
+  *ngSwitch
+
+Common pipes:
+
+  date
+  currency
+  uppercase
+
+HttpClientModule
+
+Without it:
+
+  ❌ Templates break
+  ❌ Pipes don’t work
+  ❌ HTTP calls fail
+
+3️⃣ @angular/compiler — 🧠 Template Compiler
+
+"@angular/compiler": "^16.2.0"
+
+What it does?
+
+  Compiles Angular templates (HTML)
+  Converts decorators into executable code
+  Processes metadata
+
+Used in:
+
+  JIT compilation
+  Development mode (ng serve)
+
+Without it:
+
+  ❌ Angular can’t compile templates
+  ❌ ng serve fails
 
 
+4️⃣ @angular/platform-browser — 🌐 Browser Integration
+
+"@angular/platform-browser": "^16.2.0"
+
+What it does?
+
+  Connects Angular to the browser DOM
+  Provides browser-specific services
+  Handles sanitization
+  Event handling
+
+Without it:
+
+  ❌ Angular can’t run in a browser
 
 
+5️⃣ @angular/platform-browser-dynamic — ⚡ JIT Bootstrap
+
+"@angular/platform-browser-dynamic": "^16.2.0"
+
+What it does?
+
+  Bootstraps Angular in JIT mode
+  Compiles templates in the browser
+
+Used by:
+  platformBrowserDynamic().bootstrapModule(AppModule);
+
+Without it:
+
+  ❌ ng serve fails
+  ❌ Dev mode breaks
+
+Production builds may not require it (AOT)  
+
+
+6️⃣ @angular/router — 🧭 Navigation Engine
+
+"@angular/router": "^16.2.0"
+
+What it provides?
+
+  SPA routing
+  Lazy loading
+  Guards
+  Resolvers
+
+Without it:
+
+  ❌ No navigation
+  ❌ Cannot build multi-page to SPA
+
+
+7️⃣ @angular/forms — 📝 Forms Engine
+
+"@angular/forms": "^16.2.0"
+
+What it provides?
+
+  Template-driven forms
+  Reactive forms
+  Validation
+  FormControl, FormGroup
+
+Without it:
+
+  ❌ Forms break
+  ❌ Validation unavailable
+
+
+8️⃣ @angular/animations — 🎞 Animation Engine
+
+"@angular/animations": "^16.2.0"
+
+What it provides?
+
+  Angular animation DSL
+  Transitions, triggers
+  Smooth UI effects
+
+Required by:
+
+  Angular Material
+  UI animations
+
+Without it:
+
+  ❌ Material animations break
+  ⚠ App may still run without animations
+
+
+9️⃣ @angular/material — 🎨 UI Components
+
+"@angular/material": "^16.2.14"
+
+What it is?
+
+  Angular’s official UI component library
+
+Depends on:
+
+  @angular/cdk
+  @angular/animations
+
+Provides:
+
+  Buttons, dialogs, tables, date pickers
+
+Without it:
+
+  ❌ Material UI won’t work
+
+
+🔟 @angular/cdk — 🧰 Component Dev Kit
+
+"@angular/cdk": "^16.2.14"
+
+What it is?
+
+  Low-level utilities
+  No UI
+  Used by Angular Material
+
+Provides:
+
+  Overlay
+  Drag & Drop
+  Accessibility
+  Layout utilities
+
+
+1️⃣1️⃣ rxjs — 🔄 Reactive Engine
+
+"rxjs": "~7.8.0"
+
+What it does?
+
+  Observables
+  Async data streams
+  HTTP responses
+  Event handling
+
+Angular uses it for:
+
+  HttpClient
+  Router events
+  State management
+
+Without it:
+
+  ❌ Async features break
+  ❌ HTTP stops working
+
+
+1️⃣2️⃣ zone.js — 🔍 Change Detection Trigger
+
+"zone.js": "~0.13.0"
+
+What it does?
+
+  Detects async operations
+  Triggers Angular change detection
+
+Example:
+
+  setTimeout(() => {
+    this.title = 'Updated';
+  });
+
+UI updates automatically → thanks to Zone.js
+
+Without it:
+
+  ❌ UI won’t update
+  ❌ Manual change detection needed
+
+
+1️⃣3️⃣ tslib — 🧩 TypeScript Helper Library
+
+"tslib": "^2.3.0"
+
+What it does?
+
+  Provides helper functions
+  Reduces bundle size
+
+Example helpers:
+
+  __extends
+  __assign
+
+Without it:
+
+  ❌ Compilation fails
+  ❌ Larger bundle size
+
+
+🧠 Mental Model (Easy)
+
+Think of Angular like a machine:
+
+| Part           | Package             |
+| -------------- | ------------------- |
+| Brain          | `@angular/core`     |
+| Muscles        | `@angular/common`   |
+| Nervous system | `zone.js`           |
+| Blood flow     | `rxjs`              |
+| UI skin        | `@angular/material` |
 
 
 **------------------------------------------------------------------------------------------------**
