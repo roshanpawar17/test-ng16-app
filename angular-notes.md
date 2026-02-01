@@ -2107,6 +2107,68 @@ Short definition (interview-ready):
 
   Integrity is a cryptographic hash that ensures the downloaded package has not been tampered with and is exactly the same as the one originally published.
 
+🔍 What does “tampered” mean?
+
+Simple definition:
+
+  Tampered means someone has changed something secretly or without permission, usually in a harmful or unsafe way.
+
+🧠 In technical terms:
+
+  Tampering = unauthorized modification of data, files, or software after it was created or published.
+
+This change can be:
+
+  Malicious (hacker)
+  Accidental (corruption)
+  Hidden (not obvious)
+
+📦 Example (Real-world analogy)
+
+Imagine:
+
+  You ordered a sealed medicine bottle
+  When it arrives, the seal is broken
+
+💊 The medicine is tampered
+
+You don’t know:
+
+  What was changed
+  Who changed it
+  Whether it’s safe
+
+🧑‍💻 Tampered in Software (npm / Angular context)
+
+Example scenario:
+
+1. Angular package is published:
+
+  @angular/core@16.2.0
+
+2. npm stores its SHA-512 hash
+
+3. Later, someone:
+
+  Injects malicious code
+  Modifies files
+  Replaces the package on a server
+
+➡️ The package is now tampered
+
+
+🔐 How npm detects tampering
+
+"integrity": "sha512-ABC123..."
+
+If downloaded package hash ≠ stored hash:
+
+  npm ERR! Integrity checksum failed
+
+👉 npm stops installation because the package was tampered
+
+---------------------------
+
 📍 Where you see it
 
 "integrity": "sha512-4c7xFJ1n9X1pXk0c..."
@@ -2205,6 +2267,144 @@ npm ci
 👉 Industry standard
 
 
+5️⃣ How npm uses it during install
+
+  npm install rxjs
+  ↓
+  Download rxjs-7.8.0.tgz
+  ↓
+  Calculate SHA-512
+  ↓
+  Compare with registry integrity
+  ↓
+  Save to package-lock.json
+
+8️⃣ Why integrity is version-specific
+
+Each version has a different hash
+
+  rxjs@7.8.0  → hash A
+  rxjs@7.8.1  → hash B
+
+Even if code change is tiny.
+
+Q: Your confusion (rephrased)
+
+When I run npm install rxjs for the first time:
+
+  rxjs is not yet in package-lock.json
+  So how does npm verify integrity?
+  Where does the “original integrity” come from?
+
+🧠 The Key Idea (Answer in one line)
+
+npm does NOT get integrity from package-lock.json for a new package.
+It gets integrity from the npm REGISTRY first, then writes it into package-lock.json.
+
+package-lock.json is a result, not a source.
+
+
+🔁 Let’s walk through the REAL flow
+
+Step 1️⃣ You run:
+
+  npm install rxjs
+
+At this moment:
+
+  ❌ rxjs not in package.json
+  ❌ rxjs not in package-lock.json
+
+
+Step 2️⃣ npm contacts npm registry
+
+npm sends a request to:
+
+  https://registry.npmjs.org/rxjs
+
+Registry responds with metadata like:
+
+{
+  "versions": {
+    "7.8.0": {
+      "dist": {
+        "tarball": "https://registry.npmjs.org/rxjs/-/rxjs-7.8.0.tgz",
+        "integrity": "sha512-ABC123..."
+      }
+    }
+  }
+}
+
+👉 THIS is the original integrity
+
+📌 It comes from npm registry, not your project.
+
+
+Step 3️⃣ npm downloads the package
+
+npm downloads:
+
+  rxjs-7.8.0.tgz
+
+
+Step 4️⃣ npm calculates SHA-512 locally
+
+After download:
+
+  npm computes SHA-512 hash of the .tgz
+  Compares it with registry’s integrity
+
+Computed hash === Registry hash → OK
+
+If mismatch:
+
+  npm ERR! Integrity checksum failed
+
+
+Step 5️⃣ npm writes to package-lock.json
+
+Only AFTER verification succeeds:
+
+  "node_modules/rxjs": {
+    "version": "7.8.0",
+    "resolved": "https://registry.npmjs.org/rxjs/-/rxjs-7.8.0.tgz",
+    "integrity": "sha512-ABC123..."
+  }
+
+👉 Now package-lock.json becomes the local source of truth
+
+Step 6️⃣ npm updates package.json
+
+  "dependencies": {
+    "rxjs": "^7.8.0"
+  }
+
+
+🔄 What happens on NEXT install?
+
+When you run:
+
+npm install
+
+Now npm:
+
+  Reads package-lock.json
+  Uses stored resolved + integrity
+  Verifies download again
+
+📌 Registry is no longer needed for integrity lookup unless lock changes.
+
+
+🧩 Two different integrity sources (IMPORTANT)
+
+| Situation          | Integrity source       |
+| ------------------ | ---------------------- |
+| First-time install | npm registry           |
+| Re-install         | package-lock.json      |
+| CI (`npm ci`)      | package-lock.json ONLY |
+
+----------------------------------------------------------
+
 🔹 dependencies
 
   Exact dependency tree
@@ -2245,6 +2445,307 @@ RxJS minor update:
   Breaks runtime
   Lock file prevents this.
 
+
+1️⃣ "dev": true
+
+📍 Where you usually see it
+
+Mostly inside package-lock.json, not package.json
+
+What it means?
+
+  This dependency is a development-only dependency, not required at runtime.
+
+  "dev": true
+
+
+What npm does with it?
+
+Installed during npm install
+
+❌ Skipped when running:
+
+  npm install --production
+
+
+Why it exists?
+
+Helps npm decide what to install in production
+
+Used by tools like CI/CD
+
+📌 Angular example
+
+  @angular/compiler-cli
+  typescript
+  eslint
+
+------------------------------------------
+
+2️⃣ "license": "MIT"
+
+What it means?
+
+The legal license under which the package is published.
+
+MIT license allows:
+
+  Commercial use
+  Modification
+  Distribution
+  Private use
+
+Only requirement:
+
+✔️ Keep copyright notice
+
+📌 npm uses this for:
+
+  Compliance checks
+  License auditing tools
+
+------------------------------------------
+
+
+3️⃣ "engines" (VERY IMPORTANT)
+
+"engines": {
+  "node": "^16.14.0 || >=18.10.0",
+  "npm": "^6.11.0 || ^7.5.6 || >=8.0.0",
+  "yarn": ">= 1.13.0"
+}
+
+What engines means?
+
+  Declares which runtime tools this package is compatible with.
+
+⚠️ Important behavior
+
+By default:
+
+  npm warns, not fails
+
+To enforce strictly:
+
+  npm config set engine-strict true
+
+4️⃣ "optionalDependencies"
+
+"optionalDependencies": {
+  "esbuild": "0.18.17"
+}
+
+What this means?
+
+  A dependency that improves performance, but is not required.
+
+If install fails:
+
+  ✔️ npm continues
+  ❌ App does not crash
+
+
+Angular use case (esbuild)
+
+  Angular uses esbuild for:
+
+    Faster builds
+    Faster dev server
+
+  But:
+
+    Not available on all platforms
+    Has native binaries
+
+So Angular marks it optional.
+
+5️⃣ "peerDependencies" (VERY IMPORTANT 🔥)
+
+"peerDependencies": {
+  "@angular/compiler-cli": "^16.0.0",
+  "@angular/localize": "^16.0.0"
+}
+
+What it means?
+
+  This package expects the consuming project to provide these dependencies.
+
+📌 It does NOT install them automatically.
+
+
+Why Angular uses peerDependencies?
+
+  Angular packages must:
+
+    Share the same Angular version
+    Avoid duplicate framework copies
+
+  Example problem without peers:
+
+    Two Angular cores → DI breaks → runtime errors
+
+npm behavior:
+
+  npm 7+ auto-installs peers
+  Shows warnings if version mismatch
+
+
+6️⃣ "peerDependenciesMeta"
+
+"peerDependenciesMeta": {
+  "@angular/localize": {
+    "optional": true
+  },
+  "@angular/platform-server": {
+    "optional": true
+  }
+}
+
+What this does?
+
+  Marks some peer dependencies as optional
+
+Meaning:
+
+  Package can work without them
+  No warning if missing
+
+
+Angular-specific meaning:
+
+| Package                    | Why optional         |
+| -------------------------- | -------------------- |
+| `@angular/localize`        | Needed only for i18n |
+| `@angular/platform-server` | Needed only for SSR  |
+
+
+------------------------------------------------------
+
+
+1️⃣ "name": "test-ng16-app"
+
+What it means?
+
+  The project name this lock file belongs to.
+
+Same as package.json → name
+Helps npm ensure the lock file matches the project
+
+📌 If names mismatch:
+
+  npm may regenerate the lock file
+
+
+2️⃣ "version": "0.0.0"
+
+What it means?
+
+  The version of your application, not any dependency.
+
+Copied from package.json
+Used mainly for consistency
+Rarely affects installs
+
+📌 Changing app version:
+
+  Does NOT change dependency versions
+
+
+3️⃣ "lockfileVersion": 3 🔥 (VERY IMPORTANT)
+
+What it means?
+
+  The format version of package-lock.json, NOT your app version.
+
+| lockfileVersion | npm version |
+| --------------- | ----------- |
+| 1               | npm 5–6     |
+| 2               | npm 7       |
+| **3**           | **npm 8+**  |
+
+
+Why this matters?
+
+  npm uses this to know how to read the file
+  Different versions store dependency trees differently
+
+📌 Angular 16+ → npm 8+ → lockfileVersion 3
+
+
+4️⃣ "requires": true
+
+What it means?
+
+  Indicates that this project has dependencies.
+
+Legacy flag from older npm versions
+Always true for real projects
+Mostly kept for backward compatibility
+
+📌 You can ignore it safely.
+
+
+5️⃣ "packages" 🔥🔥 (MOST IMPORTANT SECTION)
+
+"packages": {
+  "": {
+    "name": "test-ng16-app",
+    "version": "0.0.0",
+    "dependencies": {
+    }
+  }
+}
+
+🔹 What "packages" represents
+
+A map of every package installed in the project, including:
+
+  Root project
+  All node_modules
+  Nested dependencies
+
+🔹 Why the empty string "" key exists
+
+"": {
+  "name": "test-ng16-app",
+  "version": "0.0.0"
+}
+
+Meaning:
+
+"" represents your root project
+
+🔹 Root package block purpose
+
+"": {
+  "dependencies": {
+    "@angular/core": "^16.2.0"
+  }
+}
+
+
+Mirrors package.json
+Acts as entry point
+npm starts dependency resolution from here
+
+🧠 Mental model
+
+packages:
+  ""               → your app
+  node_modules/a   → dependency A
+  node_modules/b   → dependency B
+
+
+6️⃣ Why package-lock.json duplicates data
+
+You might think:
+
+  “Why repeat name/version?”
+
+Reason:
+
+  npm wants self-contained resolution
+  Lock file should work even if package.json changes
 
 **------------------------------------------------------------------------------------------------**
 
