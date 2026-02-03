@@ -2747,6 +2747,571 @@ Reason:
   npm wants self-contained resolution
   Lock file should work even if package.json changes
 
+
+-------------------------------------------------------------------------------
+
+3) angular.json  
+
+=> angular.json is the brain + control center of an Angular project.
+
+📄 What is angular.json?
+
+Proper definition (clear & interview-ready)
+
+=> angular.json is the workspace configuration file used by Angular CLI that defines how an Angular project is built, served, tested, and packaged.
+
+In short:
+
+  It tells Angular CLI how to run your app.
+
+----------------------------------------------------
+
+🧠 Think of it like this
+
+1. package.json → WHAT tools your project uses
+
+2. angular.json → HOW Angular CLI uses those tools
+
+----------------------------------------------------
+
+🏗 High-level structure
+
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "defaultProject": "my-app",
+  "projects": { }
+}
+
+
+1️⃣ $schema
+
+"$schema": "./node_modules/@angular/cli/lib/config/schema.json"
+
+What it does?
+
+  1. Enables auto-completion
+
+    -> Auto-completion means your editor suggests valid keys, values, and structure while you type.
+    -> Instead of you memorizing everything, the editor guides you.
+    -> Example WITHOUT schema (no auto-completion)
+    -> You type in angular.json:
+
+      "build": {
+        "opt"
+      }
+
+      VS Code:
+
+        ❌ No suggestions
+
+        ❌ You guess property names
+
+        ❌ High chance of typos
+
+      
+
+  2. Enables validation in editors (VS Code) 
+
+    -> Validation means the editor checks your file against rules and shows errors if something is wrong.
+    -> Example: Invalid property
+
+      You type:
+
+        "build": {
+          "optimisation": true
+        }
+
+        ❌ Wrong spelling (British English)
+
+      VS Code shows:
+
+        Red underline
+
+        Error message:
+
+        Property optimisation is not allowed
+
+      Because schema expects:
+
+        "optimization"
+
+  3. How does this work technically?
+
+    -> $schema connects JSON → rules:
+        
+      "$schema": "./node_modules/@angular/cli/lib/config/schema.json"
+
+    -> This schema file contains:
+
+      1. Allowed keys
+
+      2. Allowed values
+
+      3. Data types
+
+      4. Required fields
+
+      5. Nested structure
+
+    -> VS Code reads this file and:
+
+      1. Suggests valid options
+
+      2. Flags invalid ones
+
+      📌 Angular CLI does not use this for runtime
+      📌 Editors use it for developer experience
+
+📌 Not used at runtime
+📌 For developer experience only
+
+----------------------------------------------------
+
+2️⃣ "version": 1
+
+What it means?
+
+  1. Version of the angular.json format, not Angular itself.
+
+  2. Used internally by Angular CLI
+
+  3. Rarely changes
+
+  4. Don’t edit manually
+
+----------------------------------------------------
+
+3️⃣ "defaultProject"
+
+"defaultProject": "test-ng16-app"
+
+Purpose:
+
+  1. Used when workspace has multiple projects
+
+  2. If missing, CLI asks which project to run
+
+---------------------------------------------------- 
+
+🔧 What is "newProjectRoot": "projects"?
+
+1. Simple definition
+
+=> newProjectRoot tells Angular CLI where to create new projects (apps or libraries) inside the workspace.
+
+2. It’s mainly used for monorepo-style Angular workspaces.
+
+3. 📍 Where you see it
+
+{
+  "newProjectRoot": "projects",
+  "projects": {
+    ...
+  }
+}
+
+4. 🧠 Why this exists
+
+Angular supports:
+
+  1. Single app workspaces
+
+  2. Multi-project workspaces (monorepos)
+
+So CLI needs to know:
+
+  1. “When I create a new project, where should I put it?”
+
+  2. That’s what newProjectRoot answers.
+
+
+🎯 Interview-ready explanation
+
+newProjectRoot defines the default folder where Angular CLI places newly generated applications or libraries within a workspace, commonly used in multi-project setups.
+
+---------------------------------------------------- 
+
+4️⃣ "projects" 🔥 (MOST IMPORTANT)
+
+"projects": {
+  "test-ng16-app": {
+    ...
+  }
+}
+
+What it contains?
+
+1. Each Angular project in the workspace:
+
+  1. Applications
+
+  2. Libraries
+
+2. Angular supports monorepos.
+
+
+----------------------------------------------------
+
+🧩 Inside a project
+
+"test-ng16-app": {
+  "projectType": "application",
+  "root": "",
+  "sourceRoot": "src",
+  "architect": { }
+}
+
+1) "projectType"
+
+"projectType": "application"
+
+Values:
+
+  1. application
+
+  2. library
+
+Angular CLI behaves differently based on this.
+
+--------------------------
+
+2) "root" and "sourceRoot"
+
+"root": "",
+"sourceRoot": "src"
+
+1. root → project folder
+
+2. sourceRoot → source code location
+
+📌 For libraries, these differ.
+
+--------------------------
+
+3) "prefix"
+
+1. "prefix": "app"
+
+2. What it means (simple)
+
+=> prefix is the default HTML selector prefix for components generated in this project.
+
+3. Where it is used:
+
+  1. When you generate a component:
+
+    ng generate component header
+
+  2. Angular creates:
+
+  @Component({
+    selector: 'app-header',
+    ...
+  })
+  export class HeaderComponent {}
+
+  3. 📌 app- comes from:
+
+  "prefix": "app"
+
+  4. What if you change it?
+
+    "prefix": "admin"
+
+  Then:
+
+    selector: 'admin-header'
+
+  Used in HTML as:
+
+    <admin-header></admin-header>
+
+  5. Why prefix exists
+
+    1. Avoids HTML tag conflicts
+
+    2. Makes components project-identifiable
+
+    3. Required for custom elements naming rules
+
+  6. Real-world examples
+
+    | Project         | Prefix        |
+    | --------------- | ------------- |
+    | Angular default | `app-`        |
+    | Admin app       | `admin-`      |
+    | Library         | `ui-`, `lib-` |
+    | Company style   | `acme-`       |
+
+  7. ⚠ Important note
+
+    1. Changing prefix does NOT update existing components
+
+    2. It only affects newly generated ones
+
+
+4. Interview one-liner:
+
+  prefix defines the default selector prefix used by Angular CLI when generating components for a project.
+  
+--------------------------
+
+4) "schematics"
+
+1. What it means (simple)?
+
+  schematics defines default rules for code generation by Angular CLI.
+
+Think of it as:
+
+“How should Angular generate files for me?”
+
+
+2. Your config
+
+"schematics": {
+  "@schematics/angular:component": {
+    "style": "scss"
+  }
+}
+
+-> What this does?
+
+Whenever you generate a component:
+
+  ng generate component login
+
+-> Angular will:
+
+  ✅ Create login.component.scss
+
+  ❌ NOT create .css
+
+Because:
+
+"style": "scss"
+
+-> Without schematics
+
+Default behavior:
+
+  login.component.css
+
+-> You can control MANY things via schematics
+
+Example:  
+
+"schematics": {
+  "@schematics/angular:component": {
+    "style": "scss",
+    "skipTests": true,
+    "changeDetection": "OnPush"
+  }
+}
+
+Now every component:
+
+  1. Uses SCSS
+
+  2. No .spec.ts
+
+  3. Uses OnPush change detection
+
+
+-> Common schematic targets
+
+| Schematic    | Controls   |
+| ------------ | ---------- |
+| `:component` | Components |
+| `:service`   | Services   |
+| `:module`    | Modules    |
+| `:pipe`      | Pipes      |
+| `:directive` | Directives |
+
+-> Project-level vs global
+
+1. This is project-level, not global:
+
+"projects" → "test-ng16-app" → "schematics"
+
+2. So:
+
+  1. Different projects → different rules
+
+  2. Perfect for monorepos
+
+--------------------------
+
+5) "architect"
+
+1. 🔥 What is "architect" (big picture)
+
+-> architect defines WHAT tasks your Angular project can run and HOW they are executed.
+-> Think of architect as a task runner configuration.
+-> Each key inside architect is a command you can run with Angular CLI.
+-> 
+
+| Architect Key  | CLI Command       |
+| -------------- | ----------------- |
+| `build`        | `ng build`        |
+| `serve`        | `ng serve`        |
+| `test`         | `ng test`         |
+| `lint`         | `ng lint`         |
+| `extract-i18n` | `ng extract-i18n` |
+
+-> Each task uses a builder (implementation) and options.
+
+--------------------------
+
+2. 🧠 Mental model (important)
+
+ng build
+   ↓
+architect.build
+   ↓
+builder executes
+   ↓
+builder reads options + configurations
+   ↓
+Angular app is compiled & bundled
+
+--------------------------
+
+3. 🏗️ Now start with "build"
+
+"build": {
+  "builder": "@angular-devkit/build-angular:browser",
+  "options": {
+    "outputPath": "dist/test-ng16-app",
+    "index": "src/index.html",
+    "main": "src/main.ts",
+    "polyfills": [
+      "zone.js"
+    ],
+    "tsConfig": "tsconfig.app.json",
+    "inlineStyleLanguage": "scss",
+    "assets": [
+      "src/favicon.ico",
+      "src/assets"
+    ],
+    "styles": [
+      "@angular/material/prebuilt-themes/indigo-pink.css",
+      "src/styles.scss"
+    ],
+    "scripts": []
+  },
+  "configurations": {
+    "production": {
+      "budgets": [
+        {
+          "type": "initial",
+          "maximumWarning": "500kb",
+          "maximumError": "1mb"
+        },
+        {
+          "type": "anyComponentStyle",
+          "maximumWarning": "2kb",
+          "maximumError": "4kb"
+        }
+      ],
+      "outputHashing": "all"
+    },
+    "development": {
+      "buildOptimizer": false,
+      "optimization": false,
+      "vendorChunk": true,
+      "extractLicenses": false,
+      "sourceMap": true,
+      "namedChunks": true
+    }
+  },
+  "defaultConfiguration": "production"
+}
+
+--------------------------
+
+🔹 1. "builder"
+
+1. What it is?
+
+  A builder is a Node.js function that performs a task.
+
+2. This builder:
+
+@angular-devkit/build-angular:browser
+
+3. means:
+
+  1. Package: @angular-devkit/build-angular
+
+  2. Builder name: browser
+
+4. What this builder does internally
+
+  ✔ Compiles TypeScript
+  ✔ Runs Angular compiler (AOT/JIT)
+  ✔ Bundles code (Webpack / esbuild internally)
+  ✔ Processes HTML, CSS, assets
+  ✔ Outputs browser-ready files
+
+--------------------------
+
+🔹 2. "options" (core build inputs)
+
+1. These are the default settings for the build.
+
+2. 📁 outputPath
+
+  -> "outputPath": "dist/test-ng16-app"
+
+  -> 📌 Where final files go after build:
+
+    ng build
+
+  -> Creates:
+
+    dist/
+    └── test-ng16-app/
+        ├── index.html
+        ├── main.js
+        ├── styles.css
+        └── assets/
+
+3. 📄 index
+
+  -> "index": "src/index.html"
+
+  -> This is:
+
+    1. The HTML entry file
+
+    2. Angular injects JS/CSS bundles here automatically
+
+  -> Example injection:
+
+    <script src="main.abc123.js"></script>
+
+4. 🚀 main
+
+  -> "main": "src/main.ts"
+
+  -> This is the real entry point of Angular.
+
+  -> Flow:
+
+    index.html
+      ↓
+    main.ts
+      ↓
+    AppModule / bootstrapApplication()
+      ↓
+    Angular app starts
+
+
+
+
+
 **------------------------------------------------------------------------------------------------**
 
 
