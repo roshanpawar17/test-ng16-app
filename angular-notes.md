@@ -3308,10 +3308,61 @@ Angular app is compiled & bundled
       ↓
     Angular app starts
 
+5. ⚡ polyfills
+
+  -> "polyfills": ["zone.js"]
+
+  -> Polyfills = browser compatibility helpers.
+
+  -> Why zone.js?
+
+    -> Angular uses it to:
+
+      1. Detect async operations
+
+      2. Trigger change detection
+  
+  -> Without zone.js → Angular won’t auto-update UI.
 
 
+6. 🧾 tsConfig
+
+  -> "tsConfig": "tsconfig.app.json"
+
+  -> Tells Angular how to compile TypeScript for the application build.
+
+  -> Angular does NOT use tsconfig.json directly for builds.
+
+  -> Angular CLI:
+
+    -> Reads this file
+
+    -> Passes it to TypeScript compiler (tsc)
+
+  -> What’s inside tsconfig.app.json
+
+    {
+      "extends": "./tsconfig.json",
+      "compilerOptions": {
+        "outDir": "./out-tsc/app"
+      },
+      "files": ["src/main.ts"],
+      "include": ["src/**/*.ts"]
+    }
+  
+  -> Why separate tsconfig files?
+
+    | File                 | Purpose    |
+    | -------------------- | ---------- |
+    | `tsconfig.json`      | base rules |
+    | `tsconfig.app.json`  | app build  |
+    | `tsconfig.spec.json` | tests      |
+
+  📌 Keeps builds clean and optimized.
 
 
+7. 
+ 
 **------------------------------------------------------------------------------------------------**
 
 
